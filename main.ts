@@ -16,6 +16,7 @@ controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
 function debug_reveal_checkpoints () {
     for (let sprite of sprites.allOfKind(SpriteKind.Checkpoint)) {
         sprite.setFlag(SpriteFlag.Invisible, false)
+        sprite.sayText("" + (sprites.readDataNumber(sprite, "checkpoint") + 1) + "/" + map_checkpoints_needed)
     }
 }
 function define_animations () {
@@ -28,7 +29,7 @@ function define_animations () {
 }
 function define_maps () {
     maps = [tilemap`classic_loop_map`]
-    maps_checkpoints_needed = [3]
+    maps_checkpoints_needed = [4]
     maps_starting_tile = [assets.tile`start_right`]
     maps_driving_tiles = [tilemap`classic_loop_map_driving_tiles`]
     maps_slow_tiles = [tilemap`classic_loop_map_slow_tiles`]
@@ -68,13 +69,22 @@ function prepare_map (map_select: number) {
             tiles.setWallAt(location, true)
         }
     }
-    for (let location of tiles.getTilesByType(assets.tile`checkpoint_tile`)) {
-        sprite_checkpoint = sprites.create(assets.image`checkpoint_sprite`, SpriteKind.Checkpoint)
-        sprite_checkpoint.setFlag(SpriteFlag.Invisible, true)
-        sprite_checkpoint.setFlag(SpriteFlag.GhostThroughTiles, true)
-        sprite_checkpoint.setFlag(SpriteFlag.GhostThroughWalls, true)
-        tiles.placeOnTile(sprite_checkpoint, location)
-        tiles.setTileAt(location, map_driving_tiles[0])
+    all_checkpoint_tiles = [
+    assets.tile`checkpoint_1_tile1`,
+    assets.tile`checkpoint_2_tile`,
+    assets.tile`checkpoint_3_tile`,
+    assets.tile`checkpoint_4_tile`
+    ]
+    for (let index = 0; index <= map_checkpoints_needed - 1; index++) {
+        for (let location of tiles.getTilesByType(all_checkpoint_tiles[index])) {
+            sprite_checkpoint = sprites.create(assets.image`checkpoint_sprite`, SpriteKind.Checkpoint)
+            sprite_checkpoint.setFlag(SpriteFlag.Invisible, true)
+            sprite_checkpoint.setFlag(SpriteFlag.GhostThroughTiles, true)
+            sprite_checkpoint.setFlag(SpriteFlag.GhostThroughWalls, true)
+            sprites.setDataNumber(sprite_checkpoint, "checkpoint", index)
+            tiles.placeOnTile(sprite_checkpoint, location)
+            tiles.setTileAt(location, map_driving_tiles[0])
+        }
     }
 }
 function update_car_friction (car: Sprite, drive_frict: number, slow_frict: number) {
@@ -239,12 +249,12 @@ let local_last_tilemap: tiles.TileMapData = null
 let local_all_tiles: Image[] = []
 let sprite_car: Sprite = null
 let sprite_checkpoint: Sprite = null
+let all_checkpoint_tiles: Image[] = []
 let rng_flower: FastRandomBlocks = null
 let map_name = ""
 let map_wall_tiles: Image[] = []
 let map_slow_tiles: Image[] = []
 let map_starting_tile: Image = null
-let map_checkpoints_needed = 0
 let map_driving_tiles: Image[] = []
 let local_sprites: Sprite[] = []
 let maps_background_color: number[] = []
@@ -257,6 +267,7 @@ let maps_starting_tile: Image[] = []
 let maps_checkpoints_needed: number[] = []
 let maps: tiles.TileMapData[] = []
 let car_images: Image[][][] = []
+let map_checkpoints_needed = 0
 let sprite_player: Sprite = null
 let debug_cam: Sprite = null
 let in_game = false
