@@ -105,25 +105,6 @@ function prepare_map (map_select: number) {
         all_checkpoints.push(these_checkpoints)
     }
 }
-function update_car_friction (car: Sprite, drive_frict: number, slow_frict: number) {
-    if (spriteutils.isDestroyed(car)) {
-        return
-    }
-    for (let tile of map_driving_tiles) {
-        if (car.tileKindAt(TileDirection.Center, tile)) {
-            car.fx = drive_frict
-            car.fy = car.fx
-            return
-        }
-    }
-    for (let tile of map_slow_tiles) {
-        if (car.tileKindAt(TileDirection.Center, tile)) {
-            car.fx = slow_frict
-            car.fy = car.fx
-            return
-        }
-    }
-}
 controller.down.onEvent(ControllerButtonEvent.Released, function () {
     if (in_game) {
         move_car(sprite_player, 2, 0)
@@ -293,6 +274,26 @@ function prepare_player (skin: number) {
     scene.cameraFollowSprite(sprite_player)
     sprites.setDataBoolean(sprite_player, "bot", false)
 }
+function update_car_physics (car: Sprite, drive_frict: number, slow_frict: number, drive_max_velo: number, slow_max_velo: number) {
+    for (let tile of map_driving_tiles) {
+        if (car.tileKindAt(TileDirection.Center, tile)) {
+            car.fx = drive_frict
+            car.fy = car.fx
+            car.vx = Math.min(car.vx, drive_max_velo)
+            car.vy = Math.min(car.vy, drive_max_velo)
+            return
+        }
+    }
+    for (let tile of map_slow_tiles) {
+        if (car.tileKindAt(TileDirection.Center, tile)) {
+            car.fx = slow_frict
+            car.fy = car.fx
+            car.vx = Math.min(car.vx, slow_max_velo)
+            car.vy = Math.min(car.vy, slow_max_velo)
+            return
+        }
+    }
+}
 let local_last_vy = 0
 let local_last_vx = 0
 let local_closest_checkpoint: Sprite = null
@@ -328,9 +329,11 @@ let in_game = false
 let car_accel = 0
 stats.turnStats(false)
 car_accel = 100
+let car_drive_max_velo = 150
+let car_drive_frict = 500
+let car_slow_max_velo = 75
+let car_slow_frict = 1000
 let laps = 3
-let car_drive_frict = 1000
-let car_slow_frict = 2000
 in_game = false
 define_maps()
 define_animations()
@@ -345,7 +348,7 @@ debug_show_car_physics()
 game.onUpdate(function () {
     if (in_game) {
         for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
-            update_car_friction(sprite, car_drive_frict, car_slow_frict)
+            update_car_physics(sprite, car_drive_frict, car_slow_frict, car_drive_max_velo, car_slow_max_velo)
         }
         refresh_following()
     }
