@@ -27,6 +27,7 @@ function define_animations () {
 function define_maps () {
     maps = [tilemap`classic_loop_map`]
     maps_checkpoints_needed = [3]
+    maps_starting_tile = [assets.tile`start_right`]
     maps_driving_tiles = [tilemap`classic_loop_map_driving_tiles`]
     maps_slow_tiles = [tilemap`classic_loop_map_slow_tiles`]
     maps_wall_tiles = [tilemap`classic_loop_map_wall_tiles`]
@@ -34,10 +35,20 @@ function define_maps () {
     maps_flower_seeds = [645]
     maps_background_color = [images.colorBlock(7)]
 }
+function get_overlapping_sprites (target: Sprite, kind: number) {
+    local_sprites = []
+    for (let sprite of sprites.allOfKind(kind)) {
+        if (target.overlapsWith(sprite)) {
+            local_sprites.push(sprite)
+        }
+    }
+    return local_sprites
+}
 function prepare_map (map_select: number) {
     tiles.setCurrentTilemap(maps[map_select])
     map_driving_tiles = get_all_tiles_in_tilemap([maps_driving_tiles[map_select]])
     map_checkpoints_needed = maps_checkpoints_needed[map_select]
+    map_starting_tile = maps_starting_tile[map_select]
     map_slow_tiles = get_all_tiles_in_tilemap([maps_slow_tiles[map_select]])
     map_wall_tiles = get_all_tiles_in_tilemap([maps_wall_tiles[map_select]])
     map_name = maps_names[map_select]
@@ -112,6 +123,9 @@ controller.left.onEvent(ControllerButtonEvent.Released, function () {
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     move_car(sprite_player, 1, car_accel)
 })
+function prepare_bot (skin: number) {
+    prepare_car(skin)
+}
 function prepare_car (skin: number) {
     sprite_car = sprites.create(car_images[skin][0][0], SpriteKind.Player)
     characterAnimations.loopFrames(
@@ -162,6 +176,12 @@ function prepare_car (skin: number) {
     100,
     characterAnimations.rule(Predicate.FacingLeft, Predicate.NotMoving)
     )
+    while (true) {
+        tiles.placeOnRandomTile(sprite_car, map_starting_tile)
+        if (get_overlapping_sprites(sprite_car, SpriteKind.Player).length == 0) {
+            break;
+        }
+    }
     return sprite_car
 }
 controller.up.onEvent(ControllerButtonEvent.Released, function () {
@@ -202,14 +222,17 @@ let rng_flower: FastRandomBlocks = null
 let map_name = ""
 let map_wall_tiles: Image[] = []
 let map_slow_tiles: Image[] = []
+let map_starting_tile: Image = null
 let map_checkpoints_needed = 0
 let map_driving_tiles: Image[] = []
+let local_sprites: Sprite[] = []
 let maps_background_color: number[] = []
 let maps_flower_seeds: number[] = []
 let maps_names: string[] = []
 let maps_wall_tiles: tiles.TileMapData[] = []
 let maps_slow_tiles: tiles.TileMapData[] = []
 let maps_driving_tiles: tiles.TileMapData[] = []
+let maps_starting_tile: Image[] = []
 let maps_checkpoints_needed: number[] = []
 let maps: tiles.TileMapData[] = []
 let car_images: Image[][][] = []
@@ -224,6 +247,9 @@ define_maps()
 define_animations()
 prepare_map(0)
 prepare_player(0)
+for (let index = 0; index < 8; index++) {
+    prepare_bot(0)
+}
 debug_reveal_checkpoints()
 game.onUpdate(function () {
     for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
