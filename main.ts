@@ -1,3 +1,6 @@
+namespace SpriteKind {
+    export const Checkpoint = SpriteKind.create()
+}
 function debug_move_camera_with_directions () {
     debug_cam = sprites.create(assets.image`pink_block`, SpriteKind.Player)
     debug_cam.setFlag(SpriteFlag.GhostThroughSprites, true)
@@ -5,9 +8,15 @@ function debug_move_camera_with_directions () {
     controller.moveSprite(debug_cam, 200, 200)
     scene.cameraFollowSprite(debug_cam)
 }
+function debug_reveal_checkpoints () {
+    for (let sprite of sprites.allOfKind(SpriteKind.Checkpoint)) {
+        sprite.setFlag(SpriteFlag.Invisible, false)
+    }
+}
 function prepare_game (map_select: number) {
     tiles.setCurrentTilemap(maps[map_select])
     map_driving_tiles = get_all_tiles_in_tilemap([maps_driving_tiles[map_select]])
+    map_checkpoints_needed = maps_checkpoints_needed[map_select]
     map_slow_tiles = get_all_tiles_in_tilemap([maps_slow_tiles[map_select]])
     map_wall_tiles = get_all_tiles_in_tilemap([maps_wall_tiles[map_select]])
     map_name = maps_names[map_select]
@@ -25,9 +34,18 @@ function prepare_game (map_select: number) {
             tiles.setWallAt(location, true)
         }
     }
+    for (let location of tiles.getTilesByType(assets.tile`checkpoint_tile`)) {
+        sprite_checkpoint = sprites.create(assets.image`checkpoint_sprite`, SpriteKind.Checkpoint)
+        sprite_checkpoint.setFlag(SpriteFlag.Invisible, true)
+        sprite_checkpoint.setFlag(SpriteFlag.GhostThroughTiles, true)
+        sprite_checkpoint.setFlag(SpriteFlag.GhostThroughWalls, true)
+        tiles.placeOnTile(sprite_checkpoint, location)
+        tiles.setTileAt(location, map_driving_tiles[0])
+    }
 }
 function define_maps () {
     maps = [tilemap`classic_loop_map`]
+    maps_checkpoints_needed = [3]
     maps_driving_tiles = [tilemap`classic_loop_map_driving_tiles`]
     maps_slow_tiles = [tilemap`classic_loop_map_slow_tiles`]
     maps_wall_tiles = [tilemap`classic_loop_map_wall_tiles`]
@@ -57,6 +75,7 @@ function debug_place_tiles_in_top_right (tiles2: any[]) {
 }
 let local_last_tilemap: tiles.TileMapData = null
 let local_all_tiles: Image[] = []
+let sprite_checkpoint: Sprite = null
 let rng_flower: FastRandomBlocks = null
 let maps_flower_seeds: number[] = []
 let maps_background_color: number[] = []
@@ -66,6 +85,8 @@ let maps_wall_tiles: tiles.TileMapData[] = []
 let map_wall_tiles: Image[] = []
 let maps_slow_tiles: tiles.TileMapData[] = []
 let map_slow_tiles: Image[] = []
+let maps_checkpoints_needed: number[] = []
+let map_checkpoints_needed = 0
 let maps_driving_tiles: tiles.TileMapData[] = []
 let map_driving_tiles: Image[] = []
 let maps: tiles.TileMapData[] = []
@@ -73,3 +94,4 @@ let debug_cam: Sprite = null
 define_maps()
 prepare_game(0)
 debug_move_camera_with_directions()
+debug_reveal_checkpoints()
