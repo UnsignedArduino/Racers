@@ -9,8 +9,7 @@
         "Stats": "github:UnsignedArduino/Stats#9102333e1ca6cbaf8a979ceb252274b2f09b9005",
         "arcade-character-animations": "github:microsoft/arcade-character-animations#v0.0.2",
         "arcade-sprite-util": "github:jwunderl/arcade-sprite-util#v0.3.1",
-        "arcade-sprite-data": "github:microsoft/arcade-sprite-data#v0.1.0",
-        "arcade-tilemap-a-star": "github:UnsignedArduino/arcade-tilemap-a-star#7c8c6ca1a3e9565cbab384ce13ed3251961365e6"
+        "arcade-sprite-data": "github:microsoft/arcade-sprite-data#v0.1.0"
     },
     "files": [
         "main.blocks",

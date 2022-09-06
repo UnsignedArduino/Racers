@@ -74,7 +74,6 @@ function prepare_map (map_select: number) {
         tiles.placeOnTile(sprite_checkpoint, location)
         tiles.setTileAt(location, map_driving_tiles[0])
     }
-    paths = []
 }
 function update_car_friction (car: Sprite, drive_frict: number, slow_frict: number) {
     if (spriteutils.isDestroyed(car)) {
@@ -125,8 +124,7 @@ controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     move_car(sprite_player, 1, car_accel)
 })
 function prepare_bot (skin: number) {
-    sprite_bot = prepare_car(skin)
-    sprites.setDataBoolean(sprite_bot, "bot", true)
+    prepare_car(skin)
 }
 function prepare_car (skin: number) {
     sprite_car = sprites.create(car_images[skin][0][0], SpriteKind.Player)
@@ -186,8 +184,6 @@ function prepare_car (skin: number) {
     }
     sprites.setDataNumber(sprite_car, "lap", 0)
     sprites.setDataNumber(sprite_car, "checkpoints_got", 0)
-    sprites.setDataNumber(sprite_car, "path_index", paths.length)
-    paths.push(scene.aStar(tiles.getTilesByType(assets.tile`road_path_start0`)._pickRandom(), tiles.getTilesByType(assets.tile`road_path_end`)._pickRandom(), map_driving_tiles[0]))
     return sprite_car
 }
 controller.up.onEvent(ControllerButtonEvent.Released, function () {
@@ -211,13 +207,6 @@ function get_all_tiles_in_tilemap (tilemap_in_array: any[]) {
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
     move_car(sprite_player, 2, car_accel)
 })
-function finish_prepare () {
-    for (let tile of [assets.tile`road_path_start0`, assets.tile`road_path_end`, assets.tile`checkpoint_tile`]) {
-        for (let location of tiles.getTilesByType(tile)) {
-            tiles.setTileAt(location, assets.tile`road`)
-        }
-    }
-}
 function debug_place_tiles_in_top_right (tiles2: any[]) {
     for (let x = 0; x <= tiles2.length - 1; x++) {
         tiles.setTileAt(tiles.getTileLocation(x, 0), tiles2[x])
@@ -226,13 +215,10 @@ function debug_place_tiles_in_top_right (tiles2: any[]) {
 function prepare_player (skin: number) {
     sprite_player = prepare_car(skin)
     scene.cameraFollowSprite(sprite_player)
-    sprites.setDataBoolean(sprite_player, "bot", false)
 }
 let local_last_tilemap: tiles.TileMapData = null
 let local_all_tiles: Image[] = []
 let sprite_car: Sprite = null
-let sprite_bot: Sprite = null
-let paths: tiles.Location[][] = []
 let sprite_checkpoint: Sprite = null
 let rng_flower: FastRandomBlocks = null
 let map_name = ""
@@ -267,7 +253,6 @@ prepare_player(0)
 for (let index = 0; index < 8; index++) {
     prepare_bot(0)
 }
-finish_prepare()
 debug_reveal_checkpoints()
 game.onUpdate(function () {
     for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
