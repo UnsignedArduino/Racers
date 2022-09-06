@@ -9,6 +9,34 @@
         "mimeType": "image/x-mkcd-f4",
         "displayName": "checkpoint_sprite"
     },
+    "anim1": {
+        "namespace": "myAnimations",
+        "id": "anim1",
+        "mimeType": "application/mkcd-animation",
+        "data": "NjQwMDEwMDAxMDAwMDEwMDAwMDAwMGVlY2NlZTAwMDAwMDAwZTAyMjIyMjIwZTAwMDAwMGMyMjIyMjIyMmMwMDAwZTBjMjI0MjIyMjJjMGUwMGYwMjIyNDIyMjIyYzBmMDBmMDIyMjQyMjIyMjIwZjAwZjAyMjI0MjIyMjIyMGYwMGYwYzI0MjI0MjIyYzBmMDBlMGMyY2VjY2VjMmMwZTAwZTBlMmJjYmJjYjJlMGUwMGUwZTJiYmJiYmIyZTBlMDBlMGVlZWVlZWVlZWUwZTAwZjBkZWVlZWVlZWVkMGYwMGYwMmVlZGVlZGVlMjBmMDBmMGVmZWVlZWVlZmUwZjAwMDBmZjAwMDAwMGZmMDA=",
+        "displayName": "red_car_up"
+    },
+    "anim2": {
+        "namespace": "myAnimations",
+        "id": "anim2",
+        "mimeType": "application/mkcd-animation",
+        "data": "NjQwMDEwMDAxMDAwMDEwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMjIyMjIyMjIwMDAwMDAyMDI0MjIyMmMyMDIwMDAwYzIyNDIyMjJjMjJjMDAyMGNjNDQ0NDQ0YzI0Y2QyMjAyY2VlZWVlZWJlNGMyMjIwZTJiYmJlYmJlZTRiMjIyMGJlYmJiZWJiZWIyMjIyZTAyZTIyMmUyMjIyMmUyMmUwZWVlZWZlZWVmZTJlZGRlMGVlZWVmZWVlZWZlZWQyZTBlZWVlZmVmZmVlZWVlZWUwZmZmZmVlZWVmZmVmZWUwMGZmZmZlZmZlZmZmZjBlMDBmMGZmMDAwMGZmZmYwMDAwMDAwMDAwMDAwMDAwMDA=",
+        "displayName": "red_car_right"
+    },
+    "anim3": {
+        "namespace": "myAnimations",
+        "id": "anim3",
+        "mimeType": "application/mkcd-animation",
+        "data": "NjQwMDEwMDAxMDAwMDEwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAyMjIyMjIwMDAwMDAwMDIwNDIyNDIyMDIwMDAwMDBjMDI0MjIyMjBjMDAwMDAwYzIyNDIyMjIyYzAwMDBlMGMyMjQyMjIyMmMwZTAwZjBjMjI0MjIyMjJjMGYwMGYwY2UyMjIyMjJlYzBmMDBmMGMyYjJiYjJiMmMwZjAwZTAyMmNiY2NiYzIyMGUwMGUwYmVjY2NjY2NlYjBlMDBmMDRlNDQ0NDQ0ZTQwZjAwZjBkZTIyMjIyMmVkMGYwMDAwZDIyZDIyZDIyZDBmMDAwMDJmMmQyMmQyZjIwMDAwMDBlMDIyMjIyMjBlMDA=",
+        "displayName": "red_car_down"
+    },
+    "anim4": {
+        "namespace": "myAnimations",
+        "id": "anim4",
+        "mimeType": "application/mkcd-animation",
+        "data": "NjQwMDEwMDAxMDAwMDEwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAyMjIyMjIyMjAwMDAwMDIwMmMyMjIyNDIwMjAwMDBjMjJjMjIyMjQyMmMwMDJkYzQyYzQ0NDQ0NGNjZDAyMmM0ZWJlZWVlZWVjMjIwMjJiNGVlYmJlYmJiMmUyMDIyMjJiZWJiZWJiYmViMjAyMmUyMjIyMmUyMjJlMjIwZGRlMmVmZWVlZmVlZWVkMDJkZWVmZWVlZWZlZWVlZTBlZWVlZWVmZmVmZWVlZWUwZWVmZWZmZWVlZWZmZmYwMGUwZmZmZmVmZmVmZmZmMDAwMGZmZmYwMDAwZmYwZjAwMDAwMDAwMDAwMDAwMDA=",
+        "displayName": "red_car_left"
+    },
     "*": {
         "mimeType": "image/x-mkcd-f4",
         "dataEncoding": "base64",

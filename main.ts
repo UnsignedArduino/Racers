@@ -13,7 +13,25 @@ function debug_reveal_checkpoints () {
         sprite.setFlag(SpriteFlag.Invisible, false)
     }
 }
-function prepare_game (map_select: number) {
+function define_animations () {
+    car_images = [[
+    assets.animation`red_car_up`,
+    assets.animation`red_car_right`,
+    assets.animation`red_car_down`,
+    assets.animation`red_car_left`
+    ]]
+}
+function define_maps () {
+    maps = [tilemap`classic_loop_map`]
+    maps_checkpoints_needed = [3]
+    maps_driving_tiles = [tilemap`classic_loop_map_driving_tiles`]
+    maps_slow_tiles = [tilemap`classic_loop_map_slow_tiles`]
+    maps_wall_tiles = [tilemap`classic_loop_map_wall_tiles`]
+    maps_names = ["Classic loop"]
+    maps_flower_seeds = [645]
+    maps_background_color = [images.colorBlock(7)]
+}
+function prepare_map (map_select: number) {
     tiles.setCurrentTilemap(maps[map_select])
     map_driving_tiles = get_all_tiles_in_tilemap([maps_driving_tiles[map_select]])
     map_checkpoints_needed = maps_checkpoints_needed[map_select]
@@ -43,15 +61,57 @@ function prepare_game (map_select: number) {
         tiles.setTileAt(location, map_driving_tiles[0])
     }
 }
-function define_maps () {
-    maps = [tilemap`classic_loop_map`]
-    maps_checkpoints_needed = [3]
-    maps_driving_tiles = [tilemap`classic_loop_map_driving_tiles`]
-    maps_slow_tiles = [tilemap`classic_loop_map_slow_tiles`]
-    maps_wall_tiles = [tilemap`classic_loop_map_wall_tiles`]
-    maps_names = ["Classic loop"]
-    maps_flower_seeds = [645]
-    maps_background_color = [images.colorBlock(7)]
+function prepare_car (skin: number) {
+    sprite_car = sprites.create(car_images[skin][0][0], SpriteKind.Player)
+    characterAnimations.loopFrames(
+    sprite_car,
+    car_images[skin][0],
+    100,
+    characterAnimations.rule(Predicate.MovingUp)
+    )
+    characterAnimations.loopFrames(
+    sprite_car,
+    [car_images[skin][0][0]],
+    100,
+    characterAnimations.rule(Predicate.FacingUp, Predicate.NotMoving)
+    )
+    characterAnimations.loopFrames(
+    sprite_car,
+    car_images[skin][1],
+    100,
+    characterAnimations.rule(Predicate.MovingRight)
+    )
+    characterAnimations.loopFrames(
+    sprite_car,
+    [car_images[skin][1][0]],
+    100,
+    characterAnimations.rule(Predicate.FacingRight, Predicate.NotMoving)
+    )
+    characterAnimations.loopFrames(
+    sprite_car,
+    car_images[skin][2],
+    100,
+    characterAnimations.rule(Predicate.MovingDown)
+    )
+    characterAnimations.loopFrames(
+    sprite_car,
+    [car_images[skin][2][0]],
+    100,
+    characterAnimations.rule(Predicate.FacingDown, Predicate.NotMoving)
+    )
+    characterAnimations.loopFrames(
+    sprite_car,
+    car_images[skin][3],
+    100,
+    characterAnimations.rule(Predicate.MovingLeft)
+    )
+    characterAnimations.loopFrames(
+    sprite_car,
+    [car_images[skin][3][0]],
+    100,
+    characterAnimations.rule(Predicate.FacingLeft, Predicate.NotMoving)
+    )
+    return sprite_car
 }
 function get_all_tiles_in_tilemap (tilemap_in_array: any[]) {
     local_all_tiles = []
@@ -73,26 +133,35 @@ function debug_place_tiles_in_top_right (tiles2: any[]) {
         tiles.setTileAt(tiles.getTileLocation(x, 0), tiles2[x])
     }
 }
+function prepare_player (skin: number) {
+    sprite_player = prepare_car(skin)
+    scene.cameraFollowSprite(sprite_player)
+}
+let sprite_player: Sprite = null
 let local_last_tilemap: tiles.TileMapData = null
 let local_all_tiles: Image[] = []
+let sprite_car: Sprite = null
 let sprite_checkpoint: Sprite = null
 let rng_flower: FastRandomBlocks = null
-let maps_flower_seeds: number[] = []
-let maps_background_color: number[] = []
-let maps_names: string[] = []
 let map_name = ""
-let maps_wall_tiles: tiles.TileMapData[] = []
 let map_wall_tiles: Image[] = []
-let maps_slow_tiles: tiles.TileMapData[] = []
 let map_slow_tiles: Image[] = []
-let maps_checkpoints_needed: number[] = []
 let map_checkpoints_needed = 0
-let maps_driving_tiles: tiles.TileMapData[] = []
 let map_driving_tiles: Image[] = []
+let maps_background_color: number[] = []
+let maps_flower_seeds: number[] = []
+let maps_names: string[] = []
+let maps_wall_tiles: tiles.TileMapData[] = []
+let maps_slow_tiles: tiles.TileMapData[] = []
+let maps_driving_tiles: tiles.TileMapData[] = []
+let maps_checkpoints_needed: number[] = []
 let maps: tiles.TileMapData[] = []
+let car_images: Image[][][] = []
 let debug_cam: Sprite = null
 stats.turnStats(true)
+let car_speed = 200
 define_maps()
-prepare_game(0)
-debug_move_camera_with_directions()
+define_animations()
+prepare_map(0)
+prepare_player(0)
 debug_reveal_checkpoints()
