@@ -91,6 +91,7 @@ let maps_driving_tiles: tiles.TileMapData[] = []
 let map_driving_tiles: Image[] = []
 let maps: tiles.TileMapData[] = []
 let debug_cam: Sprite = null
+stats.turnStats(true)
 define_maps()
 prepare_game(0)
 debug_move_camera_with_directions()
