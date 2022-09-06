@@ -182,6 +182,8 @@ function prepare_car (skin: number) {
             break;
         }
     }
+    sprites.setDataNumber(sprite_car, "lap", 0)
+    sprites.setDataNumber(sprite_car, "checkpoints_got", 0)
     return sprite_car
 }
 controller.up.onEvent(ControllerButtonEvent.Released, function () {
@@ -241,6 +243,7 @@ let debug_cam: Sprite = null
 let car_accel = 0
 stats.turnStats(true)
 car_accel = 100
+let laps = 3
 let car_drive_frict = 1000
 let car_slow_frict = 2000
 define_maps()
