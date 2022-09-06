@@ -218,8 +218,8 @@ let debug_cam: Sprite = null
 let car_accel = 0
 stats.turnStats(true)
 car_accel = 100
-let car_drive_frict = 250
-let car_slow_frict = 1000
+let car_drive_frict = 1000
+let car_slow_frict = 2000
 define_maps()
 define_animations()
 prepare_map(0)
