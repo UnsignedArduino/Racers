@@ -112,10 +112,6 @@ namespace myTiles {
 . . . . . . . . . . . . . . . . 
 . . . . . . . . . . . . . . . . 
 `, [myTiles.transparency16], TileScale.Sixteen);
-            case "classic_loop_map_driving_tiles":
-            case "level7":return tiles.createTilemap(hex`0100010001`, img`
-. 
-`, [myTiles.transparency16,myTiles.tile3], TileScale.Sixteen);
             case "classic_loop_map_slow_tiles":
             case "level8":return tiles.createTilemap(hex`0400010001030402`, img`
 . . . . 
@@ -195,6 +191,10 @@ namespace myTiles {
 ..................................................
 ..................................................
 `, [myTiles.transparency16,myTiles.tile1,myTiles.tile2,myTiles.tile3,sprites.builtin.forestTiles0,myTiles.tile4,myTiles.tile7], TileScale.Sixteen);
+            case "classic_loop_map_driving_tiles":
+            case "level7":return tiles.createTilemap(hex`020001000102`, img`
+. . 
+`, [myTiles.transparency16,myTiles.tile3,myTiles.tile7], TileScale.Sixteen);
         }
         return null;
     })

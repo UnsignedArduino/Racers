@@ -8,6 +8,9 @@ function debug_move_camera_with_directions () {
     controller.moveSprite(debug_cam, 200, 200)
     scene.cameraFollowSprite(debug_cam)
 }
+controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
+    move_car(sprite_player, 0, car_accel)
+})
 function debug_reveal_checkpoints () {
     for (let sprite of sprites.allOfKind(SpriteKind.Checkpoint)) {
         sprite.setFlag(SpriteFlag.Invisible, false)
@@ -61,6 +64,54 @@ function prepare_map (map_select: number) {
         tiles.setTileAt(location, map_driving_tiles[0])
     }
 }
+function update_car_friction (car: Sprite, drive_frict: number, slow_frict: number) {
+    if (spriteutils.isDestroyed(car)) {
+        return
+    }
+    for (let tile of map_driving_tiles) {
+        if (car.tileKindAt(TileDirection.Center, tile)) {
+            car.fx = drive_frict
+            car.fy = car.fx
+            return
+        }
+    }
+    for (let tile of map_slow_tiles) {
+        if (car.tileKindAt(TileDirection.Center, tile)) {
+            car.fx = slow_frict
+            car.fy = car.fx
+            return
+        }
+    }
+}
+controller.down.onEvent(ControllerButtonEvent.Released, function () {
+    move_car(sprite_player, 2, 0)
+})
+controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
+    move_car(sprite_player, 3, car_accel)
+})
+function move_car (car: Sprite, dir: number, accel: number) {
+    if (spriteutils.isDestroyed(car)) {
+        return
+    }
+    if (dir == 0) {
+        car.ay = accel * -1
+    } else if (dir == 1) {
+        car.ax = accel
+    } else if (dir == 2) {
+        car.ay = accel
+    } else {
+        car.ax = accel * -1
+    }
+}
+controller.right.onEvent(ControllerButtonEvent.Released, function () {
+    move_car(sprite_player, 1, 0)
+})
+controller.left.onEvent(ControllerButtonEvent.Released, function () {
+    move_car(sprite_player, 3, 0)
+})
+controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
+    move_car(sprite_player, 1, car_accel)
+})
 function prepare_car (skin: number) {
     sprite_car = sprites.create(car_images[skin][0][0], SpriteKind.Player)
     characterAnimations.loopFrames(
@@ -113,6 +164,9 @@ function prepare_car (skin: number) {
     )
     return sprite_car
 }
+controller.up.onEvent(ControllerButtonEvent.Released, function () {
+    move_car(sprite_player, 0, 0)
+})
 function get_all_tiles_in_tilemap (tilemap_in_array: any[]) {
     local_all_tiles = []
     local_last_tilemap = tileUtil.currentTilemap()
@@ -128,6 +182,9 @@ function get_all_tiles_in_tilemap (tilemap_in_array: any[]) {
     local_all_tiles.pop()
     return local_all_tiles
 }
+controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
+    move_car(sprite_player, 2, car_accel)
+})
 function debug_place_tiles_in_top_right (tiles2: any[]) {
     for (let x = 0; x <= tiles2.length - 1; x++) {
         tiles.setTileAt(tiles.getTileLocation(x, 0), tiles2[x])
@@ -137,7 +194,6 @@ function prepare_player (skin: number) {
     sprite_player = prepare_car(skin)
     scene.cameraFollowSprite(sprite_player)
 }
-let sprite_player: Sprite = null
 let local_last_tilemap: tiles.TileMapData = null
 let local_all_tiles: Image[] = []
 let sprite_car: Sprite = null
@@ -157,11 +213,20 @@ let maps_driving_tiles: tiles.TileMapData[] = []
 let maps_checkpoints_needed: number[] = []
 let maps: tiles.TileMapData[] = []
 let car_images: Image[][][] = []
+let sprite_player: Sprite = null
 let debug_cam: Sprite = null
+let car_accel = 0
 stats.turnStats(true)
-let car_speed = 200
+car_accel = 100
+let car_drive_frict = 250
+let car_slow_frict = 1000
 define_maps()
 define_animations()
 prepare_map(0)
 prepare_player(0)
 debug_reveal_checkpoints()
+game.onUpdate(function () {
+    for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
+        update_car_friction(sprite, car_drive_frict, car_slow_frict)
+    }
+})
