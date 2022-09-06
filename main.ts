@@ -3,11 +3,25 @@ namespace SpriteKind {
 }
 function debug_move_camera_with_directions () {
     debug_cam = sprites.create(assets.image`pink_block`, SpriteKind.Player)
-    debug_cam.setFlag(SpriteFlag.GhostThroughSprites, true)
-    debug_cam.setFlag(SpriteFlag.GhostThroughTiles, true)
-    controller.moveSprite(debug_cam, 200, 200)
+    debug_cam.setFlag(SpriteFlag.Ghost, true)
+    controller.moveSprite(debug_cam, 500, 500)
     scene.cameraFollowSprite(debug_cam)
+    spriteutils.placeAngleFrom(
+    debug_cam,
+    0,
+    0,
+    sprite_player
+    )
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Checkpoint, function (sprite, otherSprite) {
+    if (in_game) {
+        if (sprites.readDataNumber(sprite, "checkpoints_got") == sprites.readDataNumber(otherSprite, "checkpoint")) {
+            sprites.setDataNumber(sprite, "checkpoints_got", (sprites.readDataNumber(sprite, "checkpoints_got") + 1) % map_checkpoints_needed)
+            sprite.sayText(sprites.readDataNumber(sprite, "checkpoints_got"))
+            sprites.setDataSprite(sprite, "target_checkpoint", null)
+        }
+    }
+})
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     if (in_game) {
         move_car(sprite_player, 0, car_accel)
@@ -75,7 +89,9 @@ function prepare_map (map_select: number) {
     assets.tile`checkpoint_3_tile`,
     assets.tile`checkpoint_4_tile`
     ]
+    all_checkpoints = []
     for (let index = 0; index <= map_checkpoints_needed - 1; index++) {
+        these_checkpoints = []
         for (let location of tiles.getTilesByType(all_checkpoint_tiles[index])) {
             sprite_checkpoint = sprites.create(assets.image`checkpoint_sprite`, SpriteKind.Checkpoint)
             sprite_checkpoint.setFlag(SpriteFlag.Invisible, true)
@@ -84,7 +100,9 @@ function prepare_map (map_select: number) {
             sprites.setDataNumber(sprite_checkpoint, "checkpoint", index)
             tiles.placeOnTile(sprite_checkpoint, location)
             tiles.setTileAt(location, map_driving_tiles[0])
+            these_checkpoints.push(sprite_checkpoint)
         }
+        all_checkpoints.push(these_checkpoints)
     }
 }
 function update_car_friction (car: Sprite, drive_frict: number, slow_frict: number) {
@@ -142,6 +160,7 @@ controller.left.onEvent(ControllerButtonEvent.Released, function () {
 })
 function start_race () {
     in_game = true
+    refresh_following()
 }
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     if (in_game) {
@@ -149,7 +168,8 @@ controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     }
 })
 function prepare_bot (skin: number) {
-    prepare_car(skin)
+    sprite_bot = prepare_car(skin)
+    sprites.setDataBoolean(sprite_bot, "bot", true)
 }
 function prepare_car (skin: number) {
     sprite_car = sprites.create(car_images[skin][0][0], SpriteKind.Player)
@@ -236,19 +256,53 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
         move_car(sprite_player, 2, car_accel)
     }
 })
+function refresh_following () {
+    for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
+        if (!(sprites.readDataBoolean(sprite, "bot"))) {
+            continue;
+        }
+        if (spriteutils.isDestroyed(sprites.readDataSprite(sprite, "target_checkpoint"))) {
+            local_closest_checkpoint = all_checkpoints[sprites.readDataNumber(sprite, "checkpoints_got")][0]
+            for (let sprite_checkpoint of all_checkpoints[sprites.readDataNumber(sprite, "checkpoints_got")]) {
+                if (spriteutils.distanceBetween(sprite, sprite_checkpoint) < spriteutils.distanceBetween(sprite, local_closest_checkpoint)) {
+                    local_closest_checkpoint = sprite_checkpoint
+                }
+            }
+            sprites.setDataSprite(sprite, "target_checkpoint", local_closest_checkpoint)
+        }
+        local_last_vx = sprite.vx
+        local_last_vy = sprite.vy
+        spriteutils.setVelocityAtAngle(sprite, spriteutils.angleFrom(sprite, sprites.readDataSprite(sprite, "target_checkpoint")), car_accel)
+        sprite.ax = sprite.vx * 1
+        sprite.ay = sprite.vy * 1
+        sprite.setVelocity(local_last_vx, local_last_vy)
+    }
+}
 function debug_place_tiles_in_top_right (tiles2: any[]) {
     for (let x = 0; x <= tiles2.length - 1; x++) {
         tiles.setTileAt(tiles.getTileLocation(x, 0), tiles2[x])
     }
 }
+function debug_show_car_physics () {
+    for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
+        sprite.setFlag(SpriteFlag.ShowPhysics, true)
+    }
+}
 function prepare_player (skin: number) {
     sprite_player = prepare_car(skin)
     scene.cameraFollowSprite(sprite_player)
+    sprites.setDataBoolean(sprite_player, "bot", false)
 }
+let local_last_vy = 0
+let local_last_vx = 0
+let local_closest_checkpoint: Sprite = null
 let local_last_tilemap: tiles.TileMapData = null
 let local_all_tiles: Image[] = []
 let sprite_car: Sprite = null
+let sprite_bot: Sprite = null
 let sprite_checkpoint: Sprite = null
+let these_checkpoints: Sprite[] = []
+let all_checkpoints: Sprite[][] = []
 let all_checkpoint_tiles: Image[] = []
 let rng_flower: FastRandomBlocks = null
 let map_name = ""
@@ -272,7 +326,7 @@ let sprite_player: Sprite = null
 let debug_cam: Sprite = null
 let in_game = false
 let car_accel = 0
-stats.turnStats(true)
+stats.turnStats(false)
 car_accel = 100
 let laps = 3
 let car_drive_frict = 1000
@@ -285,12 +339,14 @@ prepare_player(0)
 for (let index = 0; index < 8; index++) {
     prepare_bot(0)
 }
-debug_reveal_checkpoints()
 start_race()
+debug_reveal_checkpoints()
+debug_show_car_physics()
 game.onUpdate(function () {
     if (in_game) {
         for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
             update_car_friction(sprite, car_drive_frict, car_slow_frict)
         }
+        refresh_following()
     }
 })
