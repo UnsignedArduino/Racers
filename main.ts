@@ -413,12 +413,13 @@ let finished_cars: Sprite[] = []
 let map_checkpoints_needed = 0
 let sprite_player: Sprite = null
 let debug_cam: Sprite = null
+let sprite_321go: TextSprite = null
 let menu_leaderboard: miniMenu.MenuSprite = null
 let in_game = false
 let laps = 0
 let car_accel = 0
 let bot_steering_power = 0
-stats.turnStats(false)
+stats.turnStats(true)
 let speed_multiplier = 1
 bot_steering_power = 0.01
 car_accel = speed_multiplier * 300
@@ -426,7 +427,7 @@ let car_drive_max_velo = car_accel * 0.5
 let car_drive_frict = car_accel * 2
 let car_slow_max_velo = car_drive_max_velo * 0.5
 let car_slow_frict = car_drive_frict * 2
-laps = 0
+laps = 3
 in_game = false
 define_maps()
 define_animations()
@@ -440,8 +441,24 @@ car_names_at_begin.push(miniMenu.createMenuItem("---: " + sprites.readDataString
 make_leaderboard(car_names_at_begin, 8)
 wait_for_a_button_press_and_release()
 menu_leaderboard.close()
-debug_auto_drive()
-start_race()
+if (true) {
+    sprite_321go = textsprite.create("xxxx", 1, 15)
+    sprite_321go.setMaxFontHeight(10)
+    sprite_321go.setBorder(1, 15, 2)
+    sprite_321go.setFlag(SpriteFlag.Ghost, true)
+    sprite_321go.setFlag(SpriteFlag.RelativeToCamera, true)
+    sprite_321go.setPosition(scene.screenWidth() * 0.5, scene.screenHeight() * 0.2)
+    for (let index = 0; index <= 2; index++) {
+        sprite_321go.setText("" + (3 - index) + "...")
+        pause(1000)
+    }
+    sprite_321go.setText("GO!!")
+    start_race()
+    pause(1000)
+    sprite_321go.destroy()
+} else {
+    start_race()
+}
 game.onUpdate(function () {
     if (in_game) {
         for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
