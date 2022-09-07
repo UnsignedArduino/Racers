@@ -10,7 +10,8 @@
         "arcade-character-animations": "github:microsoft/arcade-character-animations#v0.0.2",
         "arcade-sprite-util": "github:jwunderl/arcade-sprite-util#v0.3.1",
         "arcade-sprite-data": "github:microsoft/arcade-sprite-data#v0.1.0",
-        "arcade-sprite-events": "github:riknoll/arcade-sprite-events#dc93eec8412053ebbd2b8f01cf5b6ae285d28900"
+        "arcade-sprite-events": "github:riknoll/arcade-sprite-events#dc93eec8412053ebbd2b8f01cf5b6ae285d28900",
+        "arcade-mini-menu": "github:riknoll/arcade-mini-menu#c8b01b9d47f85a5133c786f1c026b1f376fe4285"
     },
     "files": [
         "main.blocks",

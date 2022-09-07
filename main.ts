@@ -124,6 +124,11 @@ function prepare_map (map_select: number) {
     }
     finished_cars = []
 }
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (in_game && !(spriteutils.isDestroyed(menu_leaderboard))) {
+        game.over(true)
+    }
+})
 controller.down.onEvent(ControllerButtonEvent.Released, function () {
     if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
         move_car(sprite_player, 2, 0)
@@ -272,6 +277,9 @@ function make_ordinal (num: number) {
         return "" + num + "th"
     }
 }
+function debug_auto_drive () {
+    sprites.setDataBoolean(sprite_player, "bot", true)
+}
 function refresh_following () {
     for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
         if (!(sprites.readDataBoolean(sprite, "bot"))) {
@@ -351,6 +359,7 @@ function update_car_physics (car: Sprite, drive_frict: number, slow_frict: numbe
         }
     }
 }
+let local_player_names: miniMenu.MenuItem[] = []
 let sprite: Sprite = null
 let local_last_vy = 0
 let local_last_vx = 0
@@ -360,6 +369,7 @@ let local_all_tiles: Image[] = []
 let sprite_car: Sprite = null
 let bot_names: string[] = []
 let sprite_bot: Sprite = null
+let menu_leaderboard: miniMenu.MenuSprite = null
 let sprite_checkpoint: Sprite = null
 let these_checkpoints: Sprite[] = []
 let all_checkpoints: Sprite[][] = []
@@ -420,8 +430,20 @@ forever(function () {
     if (in_game) {
         if (finished_cars.length == 9) {
             pause(1000)
-            game.showLongText("You finished in " + make_ordinal(finished_cars.indexOf(sprite_player) + 1) + " place!", DialogLayout.Bottom)
-            game.over(true)
+            local_player_names = []
+            for (let index = 0; index <= finished_cars.length - 1; index++) {
+                local_player_names.push(miniMenu.createMenuItem("" + make_ordinal(index + 1) + ": " + sprites.readDataString(finished_cars[index], "name")))
+            }
+            menu_leaderboard = miniMenu.createMenuFromArray(local_player_names)
+            for (let index = 0; index < finished_cars.indexOf(sprite_player); index++) {
+                menu_leaderboard.moveSelection(miniMenu.MoveDirection.Down)
+            }
+            menu_leaderboard.setDimensions(scene.screenWidth() - 8, scene.screenHeight() - 10)
+            menu_leaderboard.setMenuStyleProperty(miniMenu.MenuStyleProperty.Border, 1)
+            menu_leaderboard.setMenuStyleProperty(miniMenu.MenuStyleProperty.BorderColor, images.colorBlock(15))
+            menu_leaderboard.setButtonEventsEnabled(false)
+            menu_leaderboard.setFlag(SpriteFlag.RelativeToCamera, true)
+            menu_leaderboard.setPosition(5, 6)
         }
     }
     pause(100)
