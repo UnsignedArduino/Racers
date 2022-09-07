@@ -30,6 +30,7 @@ events.tileEvent(SpriteKind.Player, assets.tile`checkerflag`, events.TileEvent.S
     if (sprites.readDataNumber(sprite, "lap") == laps) {
         sprite.startEffect(effects.confetti, 200)
         sprite.sayText("")
+        finished_cars.push(sprite)
         if (sprite_player == sprite) {
             sprites.setDataBoolean(sprite, "bot", true)
             sprites.setDataNumber(sprite, "checkpoints_got", 0)
@@ -119,6 +120,7 @@ function prepare_map (map_select: number) {
         }
         all_checkpoints.push(these_checkpoints)
     }
+    finished_cars = []
 }
 controller.down.onEvent(ControllerButtonEvent.Released, function () {
     if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
@@ -343,6 +345,7 @@ let maps_starting_tile: Image[] = []
 let maps_checkpoints_needed: number[] = []
 let maps: tiles.TileMapData[] = []
 let car_images: Image[][][] = []
+let finished_cars: Sprite[] = []
 let map_checkpoints_needed = 0
 let sprite_player: Sprite = null
 let debug_cam: Sprite = null
@@ -375,4 +378,14 @@ game.onUpdate(function () {
         }
         refresh_following()
     }
+})
+forever(function () {
+    if (in_game) {
+        if (finished_cars.length == 9) {
+            pause(1000)
+            game.showLongText("You finished in " + (finished_cars.indexOf(sprite_player) + 1) + " place!", DialogLayout.Bottom)
+            game.over(true)
+        }
+    }
+    pause(100)
 })
