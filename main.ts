@@ -17,7 +17,6 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Checkpoint, function (sprite, ot
     if (in_game) {
         if (sprites.readDataNumber(sprite, "checkpoints_got") == sprites.readDataNumber(otherSprite, "checkpoint")) {
             sprites.setDataNumber(sprite, "checkpoints_got", (sprites.readDataNumber(sprite, "checkpoints_got") + 1) % map_checkpoints_needed)
-            sprite.sayText(sprites.readDataNumber(sprite, "checkpoints_got"))
             sprites.setDataSprite(sprite, "target_checkpoint", null)
         }
     }
@@ -259,6 +258,11 @@ function refresh_following () {
         sprite.setVelocity(local_last_vx, local_last_vy)
     }
 }
+function debug_camera_follow_random_car () {
+    sprite = sprites.allOfKind(SpriteKind.Player)._pickRandom()
+    scene.cameraFollowSprite(sprite)
+    sprite.setFlag(SpriteFlag.ShowPhysics, true)
+}
 function debug_place_tiles_in_top_right (tiles2: any[]) {
     for (let x = 0; x <= tiles2.length - 1; x++) {
         tiles.setTileAt(tiles.getTileLocation(x, 0), tiles2[x])
@@ -278,22 +282,23 @@ function update_car_physics (car: Sprite, drive_frict: number, slow_frict: numbe
     for (let tile of map_driving_tiles) {
         if (car.tileKindAt(TileDirection.Center, tile)) {
             car.fx = drive_frict
-            car.fy = car.fx
-            car.vx = Math.min(car.vx, drive_max_velo)
-            car.vy = Math.min(car.vy, drive_max_velo)
+            car.fy = drive_frict
+            car.vx = Math.constrain(car.vx, drive_max_velo * -1, drive_max_velo)
+            car.vy = Math.constrain(car.vy, drive_max_velo * -1, drive_max_velo)
             return
         }
     }
     for (let tile of map_slow_tiles) {
         if (car.tileKindAt(TileDirection.Center, tile)) {
             car.fx = slow_frict
-            car.fy = car.fx
-            car.vx = Math.min(car.vx, slow_max_velo)
-            car.vy = Math.min(car.vy, slow_max_velo)
+            car.fy = slow_frict
+            car.vx = Math.constrain(car.vx, slow_max_velo * -1, slow_max_velo)
+            car.vy = Math.constrain(car.vy, slow_max_velo * -1, slow_max_velo)
             return
         }
     }
 }
+let sprite: Sprite = null
 let local_last_vy = 0
 let local_last_vx = 0
 let local_closest_checkpoint: Sprite = null
@@ -328,11 +333,12 @@ let debug_cam: Sprite = null
 let in_game = false
 let car_accel = 0
 stats.turnStats(false)
-car_accel = 100
-let car_drive_max_velo = 150
-let car_drive_frict = 500
-let car_slow_max_velo = 75
-let car_slow_frict = 1000
+let speed_multiplier = 1
+car_accel = speed_multiplier * 300
+let car_drive_max_velo = car_accel * 0.5
+let car_drive_frict = car_accel * 2
+let car_slow_max_velo = car_drive_max_velo * 0.5
+let car_slow_frict = car_drive_frict * 2
 let laps = 3
 in_game = false
 define_maps()
@@ -343,8 +349,6 @@ for (let index = 0; index < 8; index++) {
     prepare_bot(0)
 }
 start_race()
-debug_reveal_checkpoints()
-debug_show_car_physics()
 game.onUpdate(function () {
     if (in_game) {
         for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
