@@ -42,7 +42,7 @@ function define_animations () {
 }
 function define_maps () {
     maps = [tilemap`classic_loop_map`]
-    maps_checkpoints_needed = [4]
+    maps_checkpoints_needed = [6]
     maps_starting_tile = [assets.tile`start_right`]
     maps_driving_tiles = [tilemap`classic_loop_map_driving_tiles`]
     maps_slow_tiles = [tilemap`classic_loop_map_slow_tiles`]
@@ -86,7 +86,9 @@ function prepare_map (map_select: number) {
     assets.tile`checkpoint_1_tile1`,
     assets.tile`checkpoint_2_tile`,
     assets.tile`checkpoint_3_tile`,
-    assets.tile`checkpoint_4_tile`
+    assets.tile`checkpoint_4_tile`,
+    assets.tile`checkpoint_5_tile0`,
+    assets.tile`checkpoint_6_tile`
     ]
     all_checkpoints = []
     for (let index = 0; index <= map_checkpoints_needed - 1; index++) {
