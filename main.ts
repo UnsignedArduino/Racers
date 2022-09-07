@@ -38,6 +38,9 @@ events.tileEvent(SpriteKind.Player, assets.tile`checkerflag`, events.TileEvent.S
         sprite.sayText("" + sprites.readDataString(sprite, "name") + ": Lap " + sprites.readDataNumber(sprite, "lap"))
     }
 })
+function debug_checkpoints_gotten () {
+    show_checkpoints_gotten = true
+}
 function debug_reveal_checkpoints () {
     for (let sprite of sprites.allOfKind(SpriteKind.Checkpoint)) {
         sprite.setFlag(SpriteFlag.Invisible, false)
@@ -152,15 +155,15 @@ controller.up.onEvent(ControllerButtonEvent.Repeated, function () {
     }
 })
 function define_maps () {
-    maps = [tilemap`classic_loop_map`]
-    maps_checkpoints_needed = [6]
-    maps_starting_tile = [tilemap`classic_loop_starting_tiles`]
-    maps_driving_tiles = [tilemap`classic_loop_map_driving_tiles`]
-    maps_slow_tiles = [tilemap`classic_loop_map_slow_tiles`]
-    maps_wall_tiles = [tilemap`classic_loop_map_wall_tiles`]
-    maps_names = ["Classic loop"]
-    maps_flower_seeds = [645]
-    maps_background_color = [images.colorBlock(7)]
+    maps = [tilemap`classic_loop_map`, tilemap`forest_map`]
+    maps_checkpoints_needed = [6, 10]
+    maps_starting_tile = [tilemap`classic_loop_starting_tiles`, tilemap`forest_map_starting_tiles`]
+    maps_driving_tiles = [tilemap`classic_loop_map_driving_tiles`, tilemap`forest_map_driving_tiles`]
+    maps_slow_tiles = [tilemap`classic_loop_map_slow_tiles`, tilemap`forest_map_slow_tiles`]
+    maps_wall_tiles = [tilemap`classic_loop_map_wall_tiles`, tilemap`forest_map_wall_tiles`]
+    maps_names = ["Classic loop", "Forest"]
+    maps_flower_seeds = [645, 165]
+    maps_background_color = [images.colorBlock(7), images.colorBlock(7)]
 }
 function get_overlapping_sprites (target: Sprite, kind: number) {
     local_sprites = []
@@ -199,7 +202,11 @@ function prepare_map (map_select: number) {
     assets.tile`checkpoint_3_tile`,
     assets.tile`checkpoint_4_tile`,
     assets.tile`checkpoint_5_tile0`,
-    assets.tile`checkpoint_6_tile`
+    assets.tile`checkpoint_6_tile`,
+    assets.tile`checkpoint_7_tile`,
+    assets.tile`checkpoint_8_tile`,
+    assets.tile`checkpoint_9_tile`,
+    assets.tile`checkpoint_10_tile`
     ]
     all_checkpoints = []
     for (let index = 0; index <= map_checkpoints_needed - 1; index++) {
@@ -502,6 +509,7 @@ let maps_driving_tiles: tiles.TileMapData[] = []
 let maps_starting_tile: tiles.TileMapData[] = []
 let maps_checkpoints_needed: number[] = []
 let maps: tiles.TileMapData[] = []
+let show_checkpoints_gotten = false
 let finished_cars: Sprite[] = []
 let map_checkpoints_needed = 0
 let sprite_player: Sprite = null
@@ -525,15 +533,17 @@ controller.configureRepeatEventDefaults(0, 20)
 define_maps()
 define_animations()
 define_bot_names()
-prepare_map(0)
+prepare_map(1)
 let car_names_at_begin: miniMenu.MenuItem[] = []
 for (let index = 0; index <= 7; index++) {
     car_names_at_begin.push(miniMenu.createMenuItem("---: " + sprites.readDataString(prepare_bot(randint(0, car_images.length - 1), index), "name")))
 }
 car_names_at_begin.push(miniMenu.createMenuItem("---: " + sprites.readDataString(prepare_player(randint(0, car_images.length - 1), 8), "name")))
-make_leaderboard(car_names_at_begin, 8)
-wait_for_a_button_press_and_release()
-menu_leaderboard.close()
+if (true) {
+    make_leaderboard(car_names_at_begin, 8)
+    wait_for_a_button_press_and_release()
+    menu_leaderboard.close()
+}
 if (true) {
     sprite_321go = textsprite.create("xxxx", 1, 15)
     sprite_321go.setMaxFontHeight(10)
@@ -558,6 +568,11 @@ game.onUpdate(function () {
             update_car_physics(sprite, car_drive_frict, car_slow_frict, car_drive_max_velo, car_slow_max_velo)
         }
         refresh_following()
+        if (show_checkpoints_gotten) {
+            for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
+                sprite.sayText("Target checkpoint: " + (sprites.readDataNumber(sprite, "checkpoints_got") + 1))
+            }
+        }
     }
 })
 forever(function () {
