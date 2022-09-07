@@ -60,7 +60,7 @@ function define_animations () {
 function define_maps () {
     maps = [tilemap`classic_loop_map`]
     maps_checkpoints_needed = [6]
-    maps_starting_tile = [assets.tile`start_right`]
+    maps_starting_tile = [tilemap`classic_loop_starting_tiles`]
     maps_driving_tiles = [tilemap`classic_loop_map_driving_tiles`]
     maps_slow_tiles = [tilemap`classic_loop_map_slow_tiles`]
     maps_wall_tiles = [tilemap`classic_loop_map_wall_tiles`]
@@ -81,7 +81,7 @@ function prepare_map (map_select: number) {
     tiles.setCurrentTilemap(maps[map_select])
     map_driving_tiles = get_all_tiles_in_tilemap([maps_driving_tiles[map_select]])
     map_checkpoints_needed = maps_checkpoints_needed[map_select]
-    map_starting_tile = maps_starting_tile[map_select]
+    map_starting_tiles = get_all_tiles_in_tilemap([maps_starting_tile[map_select]])
     map_slow_tiles = get_all_tiles_in_tilemap([maps_slow_tiles[map_select]])
     map_wall_tiles = get_all_tiles_in_tilemap([maps_wall_tiles[map_select]])
     map_name = maps_names[map_select]
@@ -125,8 +125,10 @@ function prepare_map (map_select: number) {
     finished_cars = []
 }
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (in_game && !(spriteutils.isDestroyed(menu_leaderboard))) {
-        game.over(true)
+    if (in_game) {
+        if (!(spriteutils.isDestroyed(menu_leaderboard))) {
+            game.over(true)
+        }
     }
 })
 controller.down.onEvent(ControllerButtonEvent.Released, function () {
@@ -172,13 +174,14 @@ controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
         move_car(sprite_player, 1, car_accel)
     }
 })
-function prepare_bot (skin: number) {
-    sprite_bot = prepare_car(skin)
+function prepare_bot (skin: number, place_on: number) {
+    sprite_bot = prepare_car(skin, place_on)
     sprites.setDataBoolean(sprite_bot, "bot", true)
     sprites.setDataString(sprite_bot, "name", bot_names.removeAt(randint(0, bot_names.length - 1)))
     sprite_bot.sayText(sprites.readDataString(sprite_bot, "name"))
+    return sprite_bot
 }
-function prepare_car (skin: number) {
+function prepare_car (skin: number, place_on: number) {
     sprite_car = sprites.create(car_images[skin][0][0], SpriteKind.Player)
     characterAnimations.loopFrames(
     sprite_car,
@@ -228,12 +231,8 @@ function prepare_car (skin: number) {
     100,
     characterAnimations.rule(Predicate.FacingLeft, Predicate.NotMoving)
     )
-    while (true) {
-        tiles.placeOnRandomTile(sprite_car, map_starting_tile)
-        if (get_overlapping_sprites(sprite_car, SpriteKind.Player).length == 0) {
-            break;
-        }
-    }
+    tiles.placeOnRandomTile(sprite_car, map_starting_tiles[place_on + 1])
+    tileUtil.replaceAllTiles(map_starting_tiles[place_on + 1], map_starting_tiles[0])
     sprites.setDataNumber(sprite_car, "lap", 0)
     sprites.setDataNumber(sprite_car, "checkpoints_got", 0)
     return sprite_car
@@ -332,12 +331,25 @@ function define_bot_names () {
     // console.log(all);
     bot_names = "UnsignedArduino,richard,Dreadmask197,GameGod,Kat,Agent_14,jwunderl,livcheerful,DahbixLP,purna079,FlintAsher,AlexK,shakao,E-EnerG-Gamecentral,LCProCODER,omnisImperium,Lucas_M,peli,kwx,Kiwiphoenix364,UnderwaterAstronaut,cosmoscowboy,girlwhocode,Primal_Nexus,S0m3_random_guy,Colethewolf,darzu,jacob_c,MopishCobra75,AqeeAqee,ggiscool,fd268,LaserFoxPro,charliegregg,frank_schmidt,Adri314,ursoalph,mmoskal,MakeCode,CyberPulse,felixtsu,annapurna079,ThunderDrop180,TheJaky,brandodon,personalnote,NxNMatrixGL,theCobolKid,reyhanPanci256,Wanna_be_coder,edubsky,SoftTalker,Taser,GoMustangs,eanders,SCARfazewolf,SPerkins25,Segatendo,gusiscute64,Vidget,jacqueline.russell,Uggie,Purp13,EuJeen,andrew-ski,Bag3l,TZG,XDlol,Opistickz,jedgarpark,Quantum_games,Vegz78,Eden264,demoCrash,Kirito_theblacksword,ymxdj0,CarltonFade,HewwoBug,TakeTheL08,CDarius,Skitter,ractive,ThomasS,PrinceDaBezt123,marioeligi,senorlloyd,shaqattack8,ImaAngryBear,2ndClemens,Unique,shiba-jp,alex812,InvalidProject99,kirbop,Grimm,rymc88,kingcobralasersnakes,Cat10847,ChickenBoy,JRT,Eretick,hasanchik,logic_lab,MrHM,FlyingFox,Younes,timber,portalknight,Nome_muito_criativo,Gideon_loves_cats,hassan,Jabberwock,jvdos,KIKIvsIT,WeCodeMakeCode,kjw,bosnivan,Blobiy,NoValues,Local_momo,JazzyBurrito,Dylsaster,biscuit,gbraad,_nico,EgeoTube,EnteroPositivo,jmods,beepboop,Bill-0-Coding,paul,JustinXue,RarrboiMemes,WoodysWorkshop,cameron,E-EnerG-Gamecentral2,robigu444,codebott578,I_Love_HxH,stulowe80,Darkfeind,Gabriel,Kai,The_pro551,3issa,bsiever,nobita10,Sonicblaston,ChaseMor,Spinecho,Codeboy-Advanced,viny1234,IvanPoon,AussieAlpha,shaoziyang,Satisfaction,thesonicfan192,Rocket_Scion,Camaro,randomuser,drtongue96,SebT,otorp2,Redjay1011,Arielprogamer76,SAO_Me,CoolSwords4,loretod,thegreatone,squidink7,Cbomb,henrym,MinatsuT,joshmarinacci,eligaming1311,LJJames,peter,asigned_arduino,grandmadeb,cherietan,Daniel,techahoynyc,Jeanne,isaacreisbr23,jubelit,SizzleStick,DragonMountainDesign,mileswatson,Sirbull,CoolCreeper,nayrbgo,mameeewin,infchem,llNekoll,eigenjoy,CoreyZeneberg,jlj1978,KittenMaster37,Jernau,SM123456,Spacetime50,marioninja430,abchatra,cora.yang,njp,MK97-2007,salieri,NotOnefinity,Cookiecreationsyt,CuteMrMerp,KeveZeer,Napomex,mmmacademy,ArboTeach,DaEnderman,awful-coder,Galorlx,tballmsft,teachcreamer,wimberlyw,204maker,sofiania,MKleinSB,adcoding,jfo8000,Nobrain,Karlstens,Gickin,Santiago,Glitch,TailsCodingClub,Windoman,KalanTOWN,CardboardPete,GGBot,kristianpedersen,mouseart,Dace,user14,jenfoxbot,pvzsupersanicman,Josh,rossana,CharlieDeBoss12,SCAR.chris,Milo,Delta,CrownYou,dp4".split(",")
 }
-function prepare_player (skin: number) {
-    sprite_player = prepare_car(skin)
+function prepare_player (skin: number, place_on: number) {
+    sprite_player = prepare_car(skin, place_on)
     scene.cameraFollowSprite(sprite_player)
     sprites.setDataBoolean(sprite_player, "bot", false)
     sprites.setDataString(sprite_player, "name", "You")
     sprite_player.sayText(sprites.readDataString(sprite_player, "name"))
+    return sprite_player
+}
+function make_leaderboard (items: any[], scroll_to: number) {
+    menu_leaderboard = miniMenu.createMenuFromArray(items)
+    for (let index = 0; index < scroll_to; index++) {
+        menu_leaderboard.moveSelection(miniMenu.MoveDirection.Down)
+    }
+    menu_leaderboard.setDimensions(scene.screenWidth() - 8, scene.screenHeight() - 10)
+    menu_leaderboard.setMenuStyleProperty(miniMenu.MenuStyleProperty.Border, 1)
+    menu_leaderboard.setMenuStyleProperty(miniMenu.MenuStyleProperty.BorderColor, images.colorBlock(15))
+    menu_leaderboard.setButtonEventsEnabled(false)
+    menu_leaderboard.setFlag(SpriteFlag.RelativeToCamera, true)
+    menu_leaderboard.setPosition(5, 6)
 }
 function update_car_physics (car: Sprite, drive_frict: number, slow_frict: number, drive_max_velo: number, slow_max_velo: number) {
     for (let tile of map_driving_tiles) {
@@ -369,7 +381,6 @@ let local_all_tiles: Image[] = []
 let sprite_car: Sprite = null
 let bot_names: string[] = []
 let sprite_bot: Sprite = null
-let menu_leaderboard: miniMenu.MenuSprite = null
 let sprite_checkpoint: Sprite = null
 let these_checkpoints: Sprite[] = []
 let all_checkpoints: Sprite[][] = []
@@ -378,7 +389,7 @@ let rng_flower: FastRandomBlocks = null
 let map_name = ""
 let map_wall_tiles: Image[] = []
 let map_slow_tiles: Image[] = []
-let map_starting_tile: Image = null
+let map_starting_tiles: Image[] = []
 let map_driving_tiles: Image[] = []
 let local_sprites: Sprite[] = []
 let maps_background_color: number[] = []
@@ -387,7 +398,7 @@ let maps_names: string[] = []
 let maps_wall_tiles: tiles.TileMapData[] = []
 let maps_slow_tiles: tiles.TileMapData[] = []
 let maps_driving_tiles: tiles.TileMapData[] = []
-let maps_starting_tile: Image[] = []
+let maps_starting_tile: tiles.TileMapData[] = []
 let maps_checkpoints_needed: number[] = []
 let maps: tiles.TileMapData[] = []
 let car_images: Image[][][] = []
@@ -395,6 +406,7 @@ let finished_cars: Sprite[] = []
 let map_checkpoints_needed = 0
 let sprite_player: Sprite = null
 let debug_cam: Sprite = null
+let menu_leaderboard: miniMenu.MenuSprite = null
 let in_game = false
 let laps = 0
 let car_accel = 0
@@ -407,16 +419,23 @@ let car_drive_max_velo = car_accel * 0.5
 let car_drive_frict = car_accel * 2
 let car_slow_max_velo = car_drive_max_velo * 0.5
 let car_slow_frict = car_drive_frict * 2
-laps = 3
+laps = 1
 in_game = false
 define_maps()
 define_animations()
 define_bot_names()
 prepare_map(0)
-prepare_player(0)
-for (let index = 0; index < 8; index++) {
-    prepare_bot(0)
+let car_names_at_begin: miniMenu.MenuItem[] = []
+for (let index = 0; index <= 7; index++) {
+    car_names_at_begin.push(miniMenu.createMenuItem("---: " + sprites.readDataString(prepare_bot(0, index), "name")))
 }
+car_names_at_begin.push(miniMenu.createMenuItem("---: " + sprites.readDataString(prepare_player(0, 8), "name")))
+make_leaderboard(car_names_at_begin, 8)
+while (!(controller.A.isPressed())) {
+    pause(0)
+}
+menu_leaderboard.close()
+debug_auto_drive()
 start_race()
 game.onUpdate(function () {
     if (in_game) {
@@ -434,16 +453,7 @@ forever(function () {
             for (let index = 0; index <= finished_cars.length - 1; index++) {
                 local_player_names.push(miniMenu.createMenuItem("" + make_ordinal(index + 1) + ": " + sprites.readDataString(finished_cars[index], "name")))
             }
-            menu_leaderboard = miniMenu.createMenuFromArray(local_player_names)
-            for (let index = 0; index < finished_cars.indexOf(sprite_player); index++) {
-                menu_leaderboard.moveSelection(miniMenu.MoveDirection.Down)
-            }
-            menu_leaderboard.setDimensions(scene.screenWidth() - 8, scene.screenHeight() - 10)
-            menu_leaderboard.setMenuStyleProperty(miniMenu.MenuStyleProperty.Border, 1)
-            menu_leaderboard.setMenuStyleProperty(miniMenu.MenuStyleProperty.BorderColor, images.colorBlock(15))
-            menu_leaderboard.setButtonEventsEnabled(false)
-            menu_leaderboard.setFlag(SpriteFlag.RelativeToCamera, true)
-            menu_leaderboard.setPosition(5, 6)
+            make_leaderboard(local_player_names, finished_cars.indexOf(sprite_player))
         }
     }
     pause(100)
