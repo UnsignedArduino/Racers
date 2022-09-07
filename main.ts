@@ -255,8 +255,8 @@ function refresh_following () {
         local_last_vx = sprite.vx
         local_last_vy = sprite.vy
         spriteutils.setVelocityAtAngle(sprite, spriteutils.angleFrom(sprite, sprites.readDataSprite(sprite, "target_checkpoint")), car_accel)
-        sprite.ax = sprite.vx * 1
-        sprite.ay = sprite.vy * 1
+        sprite.ax = sprite.vx * (car_accel * bot_steering_power)
+        sprite.ay = sprite.vy * (car_accel * bot_steering_power)
         sprite.setVelocity(local_last_vx, local_last_vy)
     }
 }
@@ -334,8 +334,10 @@ let sprite_player: Sprite = null
 let debug_cam: Sprite = null
 let in_game = false
 let car_accel = 0
+let bot_steering_power = 0
 stats.turnStats(false)
 let speed_multiplier = 1
+bot_steering_power = 0.01
 car_accel = speed_multiplier * 300
 let car_drive_max_velo = car_accel * 0.5
 let car_drive_frict = car_accel * 2
