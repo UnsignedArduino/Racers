@@ -124,13 +124,11 @@ function prepare_map (map_select: number) {
     }
     finished_cars = []
 }
-controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (in_game) {
-        if (!(spriteutils.isDestroyed(menu_leaderboard))) {
-            game.over(true)
-        }
+function wait_for_a_button_press () {
+    while (!(controller.A.isPressed())) {
+        pause(0)
     }
-})
+}
 controller.down.onEvent(ControllerButtonEvent.Released, function () {
     if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
         move_car(sprite_player, 2, 0)
@@ -168,6 +166,11 @@ controller.left.onEvent(ControllerButtonEvent.Released, function () {
 function start_race () {
     in_game = true
     refresh_following()
+}
+function wait_for_a_button_release () {
+    while (controller.A.isPressed()) {
+        pause(0)
+    }
 }
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
@@ -262,6 +265,10 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
         move_car(sprite_player, 2, car_accel)
     }
 })
+function wait_for_a_button_press_and_release () {
+    wait_for_a_button_press()
+    wait_for_a_button_release()
+}
 // Only works from 0 - 10!
 // 
 // Used: https://stackoverflow.com/a/15810597/10291933
@@ -419,7 +426,7 @@ let car_drive_max_velo = car_accel * 0.5
 let car_drive_frict = car_accel * 2
 let car_slow_max_velo = car_drive_max_velo * 0.5
 let car_slow_frict = car_drive_frict * 2
-laps = 1
+laps = 0
 in_game = false
 define_maps()
 define_animations()
@@ -431,9 +438,7 @@ for (let index = 0; index <= 7; index++) {
 }
 car_names_at_begin.push(miniMenu.createMenuItem("---: " + sprites.readDataString(prepare_player(0, 8), "name")))
 make_leaderboard(car_names_at_begin, 8)
-while (!(controller.A.isPressed())) {
-    pause(0)
-}
+wait_for_a_button_press_and_release()
 menu_leaderboard.close()
 debug_auto_drive()
 start_race()
@@ -454,6 +459,8 @@ forever(function () {
                 local_player_names.push(miniMenu.createMenuItem("" + make_ordinal(index + 1) + ": " + sprites.readDataString(finished_cars[index], "name")))
             }
             make_leaderboard(local_player_names, finished_cars.indexOf(sprite_player))
+            wait_for_a_button_press_and_release()
+            game.over(true)
         }
     }
     pause(100)
