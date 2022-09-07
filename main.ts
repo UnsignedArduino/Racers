@@ -45,12 +45,32 @@ function debug_reveal_checkpoints () {
     }
 }
 function define_animations () {
-    car_images = [[
+    car_images = [
+    [
     assets.animation`red_car_up`,
     assets.animation`red_car_right`,
     assets.animation`red_car_down`,
     assets.animation`red_car_left`
-    ]]
+    ],
+    [
+    assets.animation`blue_car_up`,
+    assets.animation`blue_car_right`,
+    assets.animation`blue_car_down`,
+    assets.animation`blue_car_left`
+    ],
+    [
+    assets.animation`pink_car_up`,
+    assets.animation`pink_car_right`,
+    assets.animation`pink_car_down`,
+    assets.animation`pink_car_left`
+    ],
+    [
+    assets.animation`green_car_up`,
+    assets.animation`green_car_right`,
+    assets.animation`green_car_down`,
+    assets.animation`green_car_left`
+    ]
+    ]
 }
 controller.up.onEvent(ControllerButtonEvent.Repeated, function () {
     if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
@@ -298,8 +318,8 @@ function refresh_following () {
         local_last_vx = sprite.vx
         local_last_vy = sprite.vy
         spriteutils.setVelocityAtAngle(sprite, spriteutils.angleFrom(sprite, sprites.readDataSprite(sprite, "target_checkpoint")), car_accel)
-        sprite.ax = sprite.vx * (car_accel * bot_steering_power)
-        sprite.ay = sprite.vy * (car_accel * bot_steering_power)
+        sprite.ax = sprite.vx * 1
+        sprite.ay = sprite.vy * 1
         sprite.setVelocity(local_last_vx, local_last_vy)
     }
 }
@@ -408,20 +428,18 @@ let maps_driving_tiles: tiles.TileMapData[] = []
 let maps_starting_tile: tiles.TileMapData[] = []
 let maps_checkpoints_needed: number[] = []
 let maps: tiles.TileMapData[] = []
-let car_images: Image[][][] = []
 let finished_cars: Sprite[] = []
 let map_checkpoints_needed = 0
 let sprite_player: Sprite = null
 let debug_cam: Sprite = null
 let sprite_321go: TextSprite = null
 let menu_leaderboard: miniMenu.MenuSprite = null
+let car_images: Image[][][] = []
 let in_game = false
 let laps = 0
 let car_accel = 0
-let bot_steering_power = 0
 stats.turnStats(true)
 let speed_multiplier = 1
-bot_steering_power = 0.01
 car_accel = speed_multiplier * 300
 let car_drive_max_velo = car_accel * 0.5
 let car_drive_frict = car_accel * 2
@@ -436,9 +454,9 @@ define_bot_names()
 prepare_map(0)
 let car_names_at_begin: miniMenu.MenuItem[] = []
 for (let index = 0; index <= 7; index++) {
-    car_names_at_begin.push(miniMenu.createMenuItem("---: " + sprites.readDataString(prepare_bot(0, index), "name")))
+    car_names_at_begin.push(miniMenu.createMenuItem("---: " + sprites.readDataString(prepare_bot(randint(0, car_images.length - 1), index), "name")))
 }
-car_names_at_begin.push(miniMenu.createMenuItem("---: " + sprites.readDataString(prepare_player(0, 8), "name")))
+car_names_at_begin.push(miniMenu.createMenuItem("---: " + sprites.readDataString(prepare_player(randint(0, car_images.length - 1), 8), "name")))
 make_leaderboard(car_names_at_begin, 8)
 wait_for_a_button_press_and_release()
 menu_leaderboard.close()
