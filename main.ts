@@ -478,7 +478,7 @@ forever(function () {
             }
             make_leaderboard(local_player_names, finished_cars.indexOf(sprite_player))
             wait_for_a_button_press_and_release()
-            game.reset()
+            game.over(true)
         }
     }
     pause(100)
