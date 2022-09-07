@@ -28,10 +28,10 @@ controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
 })
 events.tileEvent(SpriteKind.Player, assets.tile`checkerflag`, events.TileEvent.StartOverlapping, function (sprite) {
     if (sprites.readDataNumber(sprite, "lap") == laps) {
-        sprite.startEffect(effects.confetti, 1000)
-        sprite.sayText("")
         if (finished_cars.indexOf(sprite) == -1) {
             finished_cars.push(sprite)
+            sprite.startEffect(effects.confetti, 1000)
+            sprite.sayText("" + sprites.readDataString(sprite, "name") + ": Finished " + make_ordinal(finished_cars.length))
         }
         if (sprite_player == sprite) {
             sprites.setDataBoolean(sprite, "bot", true)
@@ -40,7 +40,7 @@ events.tileEvent(SpriteKind.Player, assets.tile`checkerflag`, events.TileEvent.S
         }
     } else {
         sprites.changeDataNumberBy(sprite, "lap", 1)
-        sprite.sayText(sprites.readDataNumber(sprite, "lap"))
+        sprite.sayText("" + sprites.readDataString(sprite, "name") + ": Lap " + sprites.readDataNumber(sprite, "lap"))
     }
 })
 function debug_reveal_checkpoints () {
@@ -170,6 +170,8 @@ controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
 function prepare_bot (skin: number) {
     sprite_bot = prepare_car(skin)
     sprites.setDataBoolean(sprite_bot, "bot", true)
+    sprites.setDataString(sprite_bot, "name", bot_names.removeAt(randint(0, bot_names.length - 1)))
+    sprite_bot.sayText(sprites.readDataString(sprite_bot, "name"))
 }
 function prepare_car (skin: number) {
     sprite_car = sprites.create(car_images[skin][0][0], SpriteKind.Player)
@@ -256,6 +258,20 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
         move_car(sprite_player, 2, car_accel)
     }
 })
+// Only works from 0 - 10!
+// 
+// Used: https://stackoverflow.com/a/15810597/10291933
+function make_ordinal (num: number) {
+    if (num == 1) {
+        return "1st"
+    } else if (num == 2) {
+        return "2nd"
+    } else if (num == 3) {
+        return "3rd"
+    } else {
+        return "" + num + "th"
+    }
+}
 function refresh_following () {
     for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
         if (!(sprites.readDataBoolean(sprite, "bot"))) {
@@ -293,10 +309,27 @@ function debug_show_car_physics () {
         sprite.setFlag(SpriteFlag.ShowPhysics, true)
     }
 }
+function define_bot_names () {
+    // Pulled from: https://forum.makecode.com/u?order=likes_received&period=all 
+    // With users with more than 10 likes received as of 9/6/2022 (249 users)
+    // 
+    // JS code: (used on the page above)
+    // 
+    // const usernames = document.getElementsByClassName("username bold");
+    // let all = "";
+    // for (const e of usernames) {
+    //     all += e.children[0].innerText;
+    //     all += ",";
+    // }
+    // console.log(all);
+    bot_names = "UnsignedArduino,richard,Dreadmask197,GameGod,Kat,Agent_14,jwunderl,livcheerful,DahbixLP,purna079,FlintAsher,AlexK,shakao,E-EnerG-Gamecentral,LCProCODER,omnisImperium,Lucas_M,peli,kwx,Kiwiphoenix364,UnderwaterAstronaut,cosmoscowboy,girlwhocode,Primal_Nexus,S0m3_random_guy,Colethewolf,darzu,jacob_c,MopishCobra75,AqeeAqee,ggiscool,fd268,LaserFoxPro,charliegregg,frank_schmidt,Adri314,ursoalph,mmoskal,MakeCode,CyberPulse,felixtsu,annapurna079,ThunderDrop180,TheJaky,brandodon,personalnote,NxNMatrixGL,theCobolKid,reyhanPanci256,Wanna_be_coder,edubsky,SoftTalker,Taser,GoMustangs,eanders,SCARfazewolf,SPerkins25,Segatendo,gusiscute64,Vidget,jacqueline.russell,Uggie,Purp13,EuJeen,andrew-ski,Bag3l,TZG,XDlol,Opistickz,jedgarpark,Quantum_games,Vegz78,Eden264,demoCrash,Kirito_theblacksword,ymxdj0,CarltonFade,HewwoBug,TakeTheL08,CDarius,Skitter,ractive,ThomasS,PrinceDaBezt123,marioeligi,senorlloyd,shaqattack8,ImaAngryBear,2ndClemens,Unique,shiba-jp,alex812,InvalidProject99,kirbop,Grimm,rymc88,kingcobralasersnakes,Cat10847,ChickenBoy,JRT,Eretick,hasanchik,logic_lab,MrHM,FlyingFox,Younes,timber,portalknight,Nome_muito_criativo,Gideon_loves_cats,hassan,Jabberwock,jvdos,KIKIvsIT,WeCodeMakeCode,kjw,bosnivan,Blobiy,NoValues,Local_momo,JazzyBurrito,Dylsaster,biscuit,gbraad,_nico,EgeoTube,EnteroPositivo,jmods,beepboop,Bill-0-Coding,paul,JustinXue,RarrboiMemes,WoodysWorkshop,cameron,E-EnerG-Gamecentral2,robigu444,codebott578,I_Love_HxH,stulowe80,Darkfeind,Gabriel,Kai,The_pro551,3issa,bsiever,nobita10,Sonicblaston,ChaseMor,Spinecho,Codeboy-Advanced,viny1234,IvanPoon,AussieAlpha,shaoziyang,Satisfaction,thesonicfan192,Rocket_Scion,Camaro,randomuser,drtongue96,SebT,otorp2,Redjay1011,Arielprogamer76,SAO_Me,CoolSwords4,loretod,thegreatone,squidink7,Cbomb,henrym,MinatsuT,joshmarinacci,eligaming1311,LJJames,peter,asigned_arduino,grandmadeb,cherietan,Daniel,techahoynyc,Jeanne,isaacreisbr23,jubelit,SizzleStick,DragonMountainDesign,mileswatson,Sirbull,CoolCreeper,nayrbgo,mameeewin,infchem,llNekoll,eigenjoy,CoreyZeneberg,jlj1978,KittenMaster37,Jernau,SM123456,Spacetime50,marioninja430,abchatra,cora.yang,njp,MK97-2007,salieri,NotOnefinity,Cookiecreationsyt,CuteMrMerp,KeveZeer,Napomex,mmmacademy,ArboTeach,DaEnderman,awful-coder,Galorlx,tballmsft,teachcreamer,wimberlyw,204maker,sofiania,MKleinSB,adcoding,jfo8000,Nobrain,Karlstens,Gickin,Santiago,Glitch,TailsCodingClub,Windoman,KalanTOWN,CardboardPete,GGBot,kristianpedersen,mouseart,Dace,user14,jenfoxbot,pvzsupersanicman,Josh,rossana,CharlieDeBoss12,SCAR.chris,Milo,Delta,CrownYou,dp4".split(",")
+}
 function prepare_player (skin: number) {
     sprite_player = prepare_car(skin)
     scene.cameraFollowSprite(sprite_player)
     sprites.setDataBoolean(sprite_player, "bot", false)
+    sprites.setDataString(sprite_player, "name", "You")
+    sprite_player.sayText(sprites.readDataString(sprite_player, "name"))
 }
 function update_car_physics (car: Sprite, drive_frict: number, slow_frict: number, drive_max_velo: number, slow_max_velo: number) {
     for (let tile of map_driving_tiles) {
@@ -325,6 +358,7 @@ let local_closest_checkpoint: Sprite = null
 let local_last_tilemap: tiles.TileMapData = null
 let local_all_tiles: Image[] = []
 let sprite_car: Sprite = null
+let bot_names: string[] = []
 let sprite_bot: Sprite = null
 let sprite_checkpoint: Sprite = null
 let these_checkpoints: Sprite[] = []
@@ -367,6 +401,7 @@ laps = 3
 in_game = false
 define_maps()
 define_animations()
+define_bot_names()
 prepare_map(0)
 prepare_player(0)
 for (let index = 0; index < 8; index++) {
@@ -385,7 +420,7 @@ forever(function () {
     if (in_game) {
         if (finished_cars.length == 9) {
             pause(1000)
-            game.showLongText("You finished in " + (finished_cars.indexOf(sprite_player) + 1) + " place!", DialogLayout.Bottom)
+            game.showLongText("You finished in " + make_ordinal(finished_cars.indexOf(sprite_player) + 1) + " place!", DialogLayout.Bottom)
             game.over(true)
         }
     }
