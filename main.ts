@@ -22,8 +22,22 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Checkpoint, function (sprite, ot
     }
 })
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (in_game) {
+    if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
         move_car(sprite_player, 0, car_accel)
+    }
+})
+events.tileEvent(SpriteKind.Player, assets.tile`checkerflag`, events.TileEvent.StartOverlapping, function (sprite) {
+    if (sprites.readDataNumber(sprite, "lap") == laps) {
+        sprite.startEffect(effects.confetti, 200)
+        sprite.sayText("")
+        if (sprite_player == sprite) {
+            sprites.setDataBoolean(sprite, "bot", true)
+            sprites.setDataNumber(sprite, "checkpoints_got", 0)
+            sprites.setDataSprite(sprite, "target_checkpoint", null)
+        }
+    } else {
+        sprites.changeDataNumberBy(sprite, "lap", 1)
+        sprite.sayText(sprites.readDataNumber(sprite, "lap"))
     }
 })
 function debug_reveal_checkpoints () {
@@ -107,12 +121,12 @@ function prepare_map (map_select: number) {
     }
 }
 controller.down.onEvent(ControllerButtonEvent.Released, function () {
-    if (in_game) {
+    if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
         move_car(sprite_player, 2, 0)
     }
 })
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (in_game) {
+    if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
         move_car(sprite_player, 3, car_accel)
     }
 })
@@ -131,12 +145,12 @@ function move_car (car: Sprite, dir: number, accel: number) {
     }
 }
 controller.right.onEvent(ControllerButtonEvent.Released, function () {
-    if (in_game) {
+    if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
         move_car(sprite_player, 1, 0)
     }
 })
 controller.left.onEvent(ControllerButtonEvent.Released, function () {
-    if (in_game) {
+    if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
         move_car(sprite_player, 3, 0)
     }
 })
@@ -145,7 +159,7 @@ function start_race () {
     refresh_following()
 }
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (in_game) {
+    if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
         move_car(sprite_player, 1, car_accel)
     }
 })
@@ -214,7 +228,7 @@ function prepare_car (skin: number) {
     return sprite_car
 }
 controller.up.onEvent(ControllerButtonEvent.Released, function () {
-    if (in_game) {
+    if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
         move_car(sprite_player, 0, 0)
     }
 })
@@ -234,7 +248,7 @@ function get_all_tiles_in_tilemap (tilemap_in_array: any[]) {
     return local_all_tiles
 }
 controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (in_game) {
+    if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
         move_car(sprite_player, 2, car_accel)
     }
 })
@@ -333,6 +347,7 @@ let map_checkpoints_needed = 0
 let sprite_player: Sprite = null
 let debug_cam: Sprite = null
 let in_game = false
+let laps = 0
 let car_accel = 0
 let bot_steering_power = 0
 stats.turnStats(false)
@@ -343,7 +358,7 @@ let car_drive_max_velo = car_accel * 0.5
 let car_drive_frict = car_accel * 2
 let car_slow_max_velo = car_drive_max_velo * 0.5
 let car_slow_frict = car_drive_frict * 2
-let laps = 3
+laps = 3
 in_game = false
 define_maps()
 define_animations()
