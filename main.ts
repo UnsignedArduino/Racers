@@ -21,11 +21,6 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Checkpoint, function (sprite, ot
         }
     }
 })
-controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
-        move_car(sprite_player, 0, car_accel)
-    }
-})
 events.tileEvent(SpriteKind.Player, assets.tile`checkerflag`, events.TileEvent.StartOverlapping, function (sprite) {
     if (sprites.readDataNumber(sprite, "lap") == laps) {
         if (finished_cars.indexOf(sprite) == -1) {
@@ -57,6 +52,11 @@ function define_animations () {
     assets.animation`red_car_left`
     ]]
 }
+controller.up.onEvent(ControllerButtonEvent.Repeated, function () {
+    if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
+        move_car(sprite_player, 0, car_accel)
+    }
+})
 function define_maps () {
     maps = [tilemap`classic_loop_map`]
     maps_checkpoints_needed = [6]
@@ -134,9 +134,9 @@ controller.down.onEvent(ControllerButtonEvent.Released, function () {
         move_car(sprite_player, 2, 0)
     }
 })
-controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
+controller.right.onEvent(ControllerButtonEvent.Repeated, function () {
     if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
-        move_car(sprite_player, 3, car_accel)
+        move_car(sprite_player, 1, car_accel)
     }
 })
 function move_car (car: Sprite, dir: number, accel: number) {
@@ -172,11 +172,6 @@ function wait_for_a_button_release () {
         pause(0)
     }
 }
-controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
-        move_car(sprite_player, 1, car_accel)
-    }
-})
 function prepare_bot (skin: number, place_on: number) {
     sprite_bot = prepare_car(skin, place_on)
     sprites.setDataBoolean(sprite_bot, "bot", true)
@@ -245,6 +240,11 @@ controller.up.onEvent(ControllerButtonEvent.Released, function () {
         move_car(sprite_player, 0, 0)
     }
 })
+controller.down.onEvent(ControllerButtonEvent.Repeated, function () {
+    if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
+        move_car(sprite_player, 2, car_accel)
+    }
+})
 function get_all_tiles_in_tilemap (tilemap_in_array: any[]) {
     local_all_tiles = []
     local_last_tilemap = tileUtil.currentTilemap()
@@ -260,11 +260,6 @@ function get_all_tiles_in_tilemap (tilemap_in_array: any[]) {
     local_all_tiles.pop()
     return local_all_tiles
 }
-controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
-    if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
-        move_car(sprite_player, 2, car_accel)
-    }
-})
 function wait_for_a_button_press_and_release () {
     wait_for_a_button_press()
     wait_for_a_button_release()
@@ -378,6 +373,11 @@ function update_car_physics (car: Sprite, drive_frict: number, slow_frict: numbe
         }
     }
 }
+controller.left.onEvent(ControllerButtonEvent.Repeated, function () {
+    if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
+        move_car(sprite_player, 3, car_accel)
+    }
+})
 let local_player_names: miniMenu.MenuItem[] = []
 let sprite: Sprite = null
 let local_last_vy = 0
@@ -429,6 +429,7 @@ let car_slow_max_velo = car_drive_max_velo * 0.5
 let car_slow_frict = car_drive_frict * 2
 laps = 3
 in_game = false
+controller.configureRepeatEventDefaults(0, 20)
 define_maps()
 define_animations()
 define_bot_names()
@@ -477,7 +478,7 @@ forever(function () {
             }
             make_leaderboard(local_player_names, finished_cars.indexOf(sprite_player))
             wait_for_a_button_press_and_release()
-            game.over(true)
+            game.reset()
         }
     }
     pause(100)
