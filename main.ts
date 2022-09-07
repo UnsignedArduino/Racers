@@ -28,9 +28,11 @@ controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
 })
 events.tileEvent(SpriteKind.Player, assets.tile`checkerflag`, events.TileEvent.StartOverlapping, function (sprite) {
     if (sprites.readDataNumber(sprite, "lap") == laps) {
-        sprite.startEffect(effects.confetti, 200)
+        sprite.startEffect(effects.confetti, 1000)
         sprite.sayText("")
-        finished_cars.push(sprite)
+        if (finished_cars.indexOf(sprite) == -1) {
+            finished_cars.push(sprite)
+        }
         if (sprite_player == sprite) {
             sprites.setDataBoolean(sprite, "bot", true)
             sprites.setDataNumber(sprite, "checkpoints_got", 0)
