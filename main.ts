@@ -1,5 +1,6 @@
 namespace SpriteKind {
     export const Checkpoint = SpriteKind.create()
+    export const MiniMap = SpriteKind.create()
 }
 function debug_move_camera_with_directions () {
     debug_cam = sprites.create(assets.image`pink_block`, SpriteKind.Player)
@@ -282,6 +283,28 @@ function wait_for_a_button_release () {
         pause(0)
     }
 }
+function update_minimap () {
+    if (show_minimap) {
+        minimap2 = minimap.minimap(MinimapScale.Sixteenth, 1, 15)
+        for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
+            minimap.includeSprite(minimap2, sprite, MinimapSpriteScale.Quadruple)
+        }
+        if (spriteutils.isDestroyed(sprite_minimap)) {
+            sprite_minimap = sprites.create(minimap.getImage(minimap2), SpriteKind.MiniMap)
+            sprite_minimap.setFlag(SpriteFlag.Ghost, true)
+            sprite_minimap.setFlag(SpriteFlag.RelativeToCamera, true)
+            sprite_minimap.left = 4
+            sprite_minimap.bottom = scene.screenHeight() - 4
+            sprite_minimap.setScale(0.5, ScaleAnchor.BottomLeft)
+        } else {
+            sprite_minimap.setImage(minimap.getImage(minimap2))
+        }
+    } else {
+        if (!(spriteutils.isDestroyed(sprite_minimap))) {
+            sprite_minimap.destroy()
+        }
+    }
+}
 function prepare_bot (skin: number, place_on: number) {
     sprite_bot = prepare_car(skin, place_on)
     sprites.setDataBoolean(sprite_bot, "bot", true)
@@ -498,6 +521,8 @@ let local_all_tiles: Image[] = []
 let sprite_car: Sprite = null
 let bot_names: string[] = []
 let sprite_bot: Sprite = null
+let sprite_minimap: Sprite = null
+let minimap2: minimap.Minimap = null
 let sprite_checkpoint: Sprite = null
 let these_checkpoints: Sprite[] = []
 let all_checkpoints: Sprite[][] = []
@@ -527,6 +552,7 @@ let debug_cam: Sprite = null
 let sprite_321go: TextSprite = null
 let menu_leaderboard: miniMenu.MenuSprite = null
 let car_images: Image[][][] = []
+let show_minimap = false
 let in_game = false
 let laps = 0
 let car_accel = 0
@@ -539,11 +565,12 @@ let car_slow_max_velo = car_drive_max_velo * 0.5
 let car_slow_frict = car_drive_frict * 2
 laps = 3
 in_game = false
+show_minimap = false
 controller.configureRepeatEventDefaults(0, 20)
 define_maps()
 define_animations()
 define_bot_names()
-prepare_map(0)
+prepare_map(1)
 let car_names_at_begin: miniMenu.MenuItem[] = []
 for (let index = 0; index <= 7; index++) {
     car_names_at_begin.push(miniMenu.createMenuItem("---: " + sprites.readDataString(prepare_bot(randint(0, car_images.length - 1), index), "name")))
@@ -554,24 +581,27 @@ if (true) {
     wait_for_a_button_press_and_release()
     menu_leaderboard.close()
 }
-if (true) {
-    sprite_321go = textsprite.create("xxxx", 1, 15)
-    sprite_321go.setMaxFontHeight(10)
-    sprite_321go.setBorder(1, 15, 2)
-    sprite_321go.setFlag(SpriteFlag.Ghost, true)
-    sprite_321go.setFlag(SpriteFlag.RelativeToCamera, true)
-    sprite_321go.setPosition(scene.screenWidth() * 0.5, scene.screenHeight() * 0.2)
-    for (let index = 0; index <= 2; index++) {
-        sprite_321go.setText("" + (3 - index) + "...")
+show_minimap = true
+timer.background(function () {
+    if (true) {
+        sprite_321go = textsprite.create("xxxx", 1, 15)
+        sprite_321go.setMaxFontHeight(10)
+        sprite_321go.setBorder(1, 15, 2)
+        sprite_321go.setFlag(SpriteFlag.Ghost, true)
+        sprite_321go.setFlag(SpriteFlag.RelativeToCamera, true)
+        sprite_321go.setPosition(scene.screenWidth() * 0.5, scene.screenHeight() * 0.2)
+        for (let index = 0; index <= 2; index++) {
+            sprite_321go.setText("" + (3 - index) + "...")
+            pause(1000)
+        }
+        sprite_321go.setText("GO!!")
+        start_race()
         pause(1000)
+        sprite_321go.destroy()
+    } else {
+        start_race()
     }
-    sprite_321go.setText("GO!!")
-    start_race()
-    pause(1000)
-    sprite_321go.destroy()
-} else {
-    start_race()
-}
+})
 game.onUpdate(function () {
     if (in_game) {
         for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
@@ -584,6 +614,7 @@ game.onUpdate(function () {
             }
         }
     }
+    update_minimap()
 })
 forever(function () {
     if (in_game) {
@@ -594,6 +625,7 @@ forever(function () {
                 local_player_names.push(miniMenu.createMenuItem("" + make_ordinal(index + 1) + ": " + sprites.readDataString(finished_cars[index], "name")))
             }
             sprite_finished_cars.destroy()
+            show_minimap = false
             make_leaderboard(local_player_names, finished_cars.indexOf(sprite_player))
             wait_for_a_button_press_and_release()
             game.over(true)
