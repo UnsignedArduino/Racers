@@ -27,6 +27,15 @@ events.tileEvent(SpriteKind.Player, assets.tile`checkerflag`, events.TileEvent.S
             finished_cars.push(sprite)
             sprite.startEffect(effects.confetti, 1000)
             sprite.sayText("" + sprites.readDataString(sprite, "name") + ": Finished " + make_ordinal(finished_cars.length))
+            if (spriteutils.isDestroyed(sprite_finished_cars)) {
+                sprite_finished_cars = textsprite.create("1/9 finished", 1, 15)
+                sprite_finished_cars.setBorder(1, 15, 2)
+                sprite_finished_cars.setFlag(SpriteFlag.Ghost, true)
+                sprite_finished_cars.setFlag(SpriteFlag.RelativeToCamera, true)
+                sprite_finished_cars.setPosition(scene.screenWidth() * 0.5, scene.screenHeight() * 0.1)
+            } else {
+                sprite_finished_cars.setText("" + finished_cars.length + "/9 finished")
+            }
         }
         if (sprite_player == sprite) {
             sprites.setDataBoolean(sprite, "bot", true)
@@ -510,6 +519,7 @@ let maps_starting_tile: tiles.TileMapData[] = []
 let maps_checkpoints_needed: number[] = []
 let maps: tiles.TileMapData[] = []
 let show_checkpoints_gotten = false
+let sprite_finished_cars: TextSprite = null
 let finished_cars: Sprite[] = []
 let map_checkpoints_needed = 0
 let sprite_player: Sprite = null
@@ -533,7 +543,7 @@ controller.configureRepeatEventDefaults(0, 20)
 define_maps()
 define_animations()
 define_bot_names()
-prepare_map(1)
+prepare_map(0)
 let car_names_at_begin: miniMenu.MenuItem[] = []
 for (let index = 0; index <= 7; index++) {
     car_names_at_begin.push(miniMenu.createMenuItem("---: " + sprites.readDataString(prepare_bot(randint(0, car_images.length - 1), index), "name")))
@@ -583,6 +593,7 @@ forever(function () {
             for (let index = 0; index <= finished_cars.length - 1; index++) {
                 local_player_names.push(miniMenu.createMenuItem("" + make_ordinal(index + 1) + ": " + sprites.readDataString(finished_cars[index], "name")))
             }
+            sprite_finished_cars.destroy()
             make_leaderboard(local_player_names, finished_cars.indexOf(sprite_player))
             wait_for_a_button_press_and_release()
             game.over(true)
