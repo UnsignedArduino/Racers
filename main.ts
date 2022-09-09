@@ -185,14 +185,24 @@ function get_overlapping_sprites (target: Sprite, kind: number) {
     return local_sprites
 }
 function prepare_map (map_select: number) {
+    LoadingAnimations.show_loading(100)
+    LoadingAnimations.set_loading_value(LoadingAnimations.LoadingValue.Minimum, 0)
+    LoadingAnimations.set_loading_value(LoadingAnimations.LoadingValue.Current, 0)
+    LoadingAnimations.set_loading_value(LoadingAnimations.LoadingValue.Maximum, 8)
+    pause(1000)
     tiles.setCurrentTilemap(maps[map_select])
     map_driving_tiles = get_all_tiles_in_tilemap([maps_driving_tiles[map_select]])
+    increment_loader()
     map_checkpoints_needed = maps_checkpoints_needed[map_select]
     map_starting_tiles = get_all_tiles_in_tilemap([maps_starting_tile[map_select]])
+    increment_loader()
     map_slow_tiles = get_all_tiles_in_tilemap([maps_slow_tiles[map_select]])
+    increment_loader()
     map_wall_tiles = get_all_tiles_in_tilemap([maps_wall_tiles[map_select]])
+    increment_loader()
     map_name = maps_names[map_select]
     scene.setBackgroundColor(maps_background_color[map_select])
+    increment_loader()
     if (maps_flower_seeds[map_select] != -1) {
         rng_flower = Random.createRNG(maps_flower_seeds[map_select])
         for (let index = 0; index < tiles.getTilesByType(assets.tile`grass`).length / 6; index++) {
@@ -201,11 +211,13 @@ function prepare_map (map_select: number) {
             }
         }
     }
+    increment_loader()
     for (let tile of map_wall_tiles) {
         for (let location of tiles.getTilesByType(tile)) {
             tiles.setWallAt(location, true)
         }
     }
+    increment_loader()
     all_checkpoint_tiles = [
     assets.tile`checkpoint_1_tile1`,
     assets.tile`checkpoint_2_tile`,
@@ -234,6 +246,9 @@ function prepare_map (map_select: number) {
         all_checkpoints.push(these_checkpoints)
     }
     finished_cars = []
+    increment_loader()
+    pause(1000)
+    LoadingAnimations.hide_loading()
 }
 function wait_for_a_button_press () {
     while (!(controller.A.isPressed())) {
@@ -373,6 +388,10 @@ controller.up.onEvent(ControllerButtonEvent.Released, function () {
         move_car(sprite_player, 0, 0)
     }
 })
+function increment_loader () {
+    LoadingAnimations.change_loading_value(LoadingAnimations.LoadingValue.Current, 1)
+    pause(0)
+}
 controller.down.onEvent(ControllerButtonEvent.Repeated, function () {
     if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
         move_car(sprite_player, 2, car_accel)
@@ -557,6 +576,13 @@ let in_game = false
 let laps = 0
 let car_accel = 0
 stats.turnStats(true)
+if (true) {
+    pause(1000)
+    LoadingAnimations.show_splash()
+    pause(5000)
+    LoadingAnimations.hide_splash()
+    pause(1000)
+}
 let speed_multiplier = 1
 car_accel = speed_multiplier * 300
 let car_drive_max_velo = car_accel * 0.5
