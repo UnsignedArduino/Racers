@@ -16,7 +16,8 @@
         "controller": "*",
         "arcade-minimap": "github:microsoft/arcade-minimap#v0.6.1",
         "Timers": "github:microsoft/arcade-timers#v1.1.0",
-        "InhouseLoadingAnimations": "github:unsignedarduino/inhouseloadinganimations#v1.0.0"
+        "InhouseLoadingAnimations": "github:unsignedarduino/inhouseloadinganimations#v1.0.0",
+        "Notifications": "github:unsignedarduino/notifications#de6517dcc280cafe902ef212f59d4f55a982c7ec"
     },
     "files": [
         "main.blocks",

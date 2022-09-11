@@ -432,6 +432,16 @@ function get_all_tiles_in_tilemap (tilemap_in_array: any[]) {
     local_all_tiles.pop()
     return local_all_tiles
 }
+controller.menu.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (splash_mode) {
+    	
+    } else if (in_game) {
+        timer.background(function () {
+            Notification.cancelNotification()
+            Notification.notify("Cannot open system menu right now, go to start menu to change settings!")
+        })
+    }
+})
 function wait_for_a_button_press_and_release () {
     wait_for_a_button_press()
     wait_for_a_button_release()
