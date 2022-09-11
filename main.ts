@@ -194,7 +194,7 @@ function prepare_map (map_select: number) {
     LoadingAnimations.set_loading_value(LoadingAnimations.LoadingValue.Current, 0)
     LoadingAnimations.set_loading_value(LoadingAnimations.LoadingValue.Maximum, 8)
     pause(1000)
-    tiles.setCurrentTilemap(maps[map_select])
+    tiles.setCurrentTilemap(tileUtil.cloneMap(maps[map_select]))
     map_driving_tiles = get_all_tiles_in_tilemap([maps_driving_tiles[map_select]])
     increment_loader()
     map_checkpoints_needed = maps_checkpoints_needed[map_select]
@@ -301,6 +301,16 @@ function wait_for_a_button_release () {
     while (controller.A.isPressed()) {
         pause(0)
     }
+}
+function define_menu_styles () {
+    menu_start = miniMenu.createMenuFromArray([])
+    menu_start.setMenuStyleProperty(miniMenu.MenuStyleProperty.Border, 1)
+    menu_start.setMenuStyleProperty(miniMenu.MenuStyleProperty.BorderColor, images.colorBlock(15))
+    menu_start.setMenuStyleProperty(miniMenu.MenuStyleProperty.BackgroundColor, images.colorBlock(1))
+    menu_start.setMenuStyleProperty(miniMenu.MenuStyleProperty.UseAsTemplate, 1)
+    menu_start.setStyleProperty(miniMenu.StyleKind.Title, miniMenu.StyleProperty.Foreground, images.colorBlock(1))
+    menu_start.setStyleProperty(miniMenu.StyleKind.Title, miniMenu.StyleProperty.Background, images.colorBlock(15))
+    menu_start.close()
 }
 function update_minimap () {
     if (show_minimap) {
@@ -610,6 +620,7 @@ controller.configureRepeatEventDefaults(0, 20)
 define_maps()
 define_animations()
 define_bot_names()
+define_menu_styles()
 timer.background(function () {
     if (true) {
         splash_mode = true
@@ -618,7 +629,7 @@ timer.background(function () {
         prepare_bot(randint(0, car_images.length - 1), 0)
         scene.cameraFollowSprite(prepare_bot(randint(0, car_images.length - 1), 1))
         for (let index = 0; index <= 6; index++) {
-            prepare_bot(randint(0, car_images.length - 1), index)
+            prepare_bot(randint(0, car_images.length - 1), index + 2)
         }
         sprite_title = textsprite.create("Racers!", 1, 15)
         sprite_title.setMaxFontHeight(16)
@@ -630,10 +641,6 @@ timer.background(function () {
         while (!(done_options)) {
             menu_start = miniMenu.createMenuFromArray([miniMenu.createMenuItem("Start")])
             menu_start.setDimensions(sprite_title.width, scene.screenHeight() - 12 - sprite_title.height)
-            menu_start.setMenuStyleProperty(miniMenu.MenuStyleProperty.Border, 1)
-            menu_start.setMenuStyleProperty(miniMenu.MenuStyleProperty.BorderColor, images.colorBlock(15))
-            menu_start.setMenuStyleProperty(miniMenu.MenuStyleProperty.BackgroundColor, images.colorBlock(1))
-            menu_start.setMenuStyleProperty(miniMenu.MenuStyleProperty.UseAsTemplate, 1)
             menu_start.setFlag(SpriteFlag.Ghost, true)
             menu_start.setFlag(SpriteFlag.RelativeToCamera, true)
             menu_start.setPosition(5, sprite_title.bottom + 4)
@@ -648,6 +655,7 @@ timer.background(function () {
                         menu_options.push(miniMenu.createMenuItem(names))
                     }
                     menu_map_select = miniMenu.createMenuFromArray(menu_options)
+                    menu_map_select.setDimensions(sprite_title.width, scene.screenHeight() - 12 - sprite_title.height)
                     menu_map_select.setTitle("Select a map:")
                     menu_map_select.setFlag(SpriteFlag.Ghost, true)
                     menu_map_select.setFlag(SpriteFlag.RelativeToCamera, true)
