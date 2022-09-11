@@ -347,6 +347,18 @@ function update_minimap () {
         }
     }
 }
+function make_title_menu (title: string, options: any[]) {
+    menu_start = miniMenu.createMenuFromArray(options)
+    if (title.length > 0) {
+        menu_start.setTitle(title)
+    }
+    menu_start.setDimensions(sprite_title.width, scene.screenHeight() - 12 - sprite_title.height)
+    menu_start.setFlag(SpriteFlag.Ghost, true)
+    menu_start.setFlag(SpriteFlag.RelativeToCamera, true)
+    menu_start.setFlag(SpriteFlag.AutoDestroy, true)
+    menu_start.setPosition(5, sprite_title.bottom + 4)
+    return menu_start
+}
 function prepare_bot (skin: number, place_on: number) {
     sprite_bot = prepare_car(skin, place_on)
     sprites.setDataBoolean(sprite_bot, "bot", true)
@@ -583,6 +595,7 @@ let bot_names: string[] = []
 let sprite_bot: Sprite = null
 let sprite_minimap: Sprite = null
 let minimap2: minimap.Minimap = null
+let menu_start: miniMenu.MenuSprite = null
 let finished_cars: Sprite[] = []
 let sprite_checkpoint: Sprite = null
 let these_checkpoints: Sprite[] = []
@@ -610,12 +623,11 @@ let debug_cam: Sprite = null
 let sprite_321go: TextSprite = null
 let menu_leaderboard: miniMenu.MenuSprite = null
 let car_names_at_begin: miniMenu.MenuItem[] = []
-let car_images_names: string[] = []
 let menu_inner: miniMenu.MenuSprite = null
+let car_images_names: string[] = []
 let maps_names: string[] = []
 let menu_options: miniMenu.MenuItem[] = []
 let option_selected = false
-let menu_start: miniMenu.MenuSprite = null
 let done_options = false
 let sprite_title: TextSprite = null
 let car_images: Image[][][] = []
@@ -667,33 +679,22 @@ timer.background(function () {
         sprite_title.left = 4
         fade_out(false, true)
         while (!(done_options)) {
-            menu_start = miniMenu.createMenuFromArray([
+            start_race()
+            option_selected = false
+            done_options = false
+            make_title_menu("", [
             miniMenu.createMenuItem("Play"),
             miniMenu.createMenuItem("Skins"),
             miniMenu.createMenuItem("Settings"),
             miniMenu.createMenuItem("Reset preferences")
-            ])
-            menu_start.setDimensions(sprite_title.width, scene.screenHeight() - 12 - sprite_title.height)
-            menu_start.setFlag(SpriteFlag.Ghost, true)
-            menu_start.setFlag(SpriteFlag.RelativeToCamera, true)
-            menu_start.setPosition(5, sprite_title.bottom + 4)
-            start_race()
-            option_selected = false
-            done_options = false
-            menu_start.onButtonPressed(controller.A, function (selection, selectedIndex) {
+            ]).onButtonPressed(controller.A, function (selection, selectedIndex) {
                 if (selectedIndex == 0) {
                     sprites.destroyAllSpritesOfKind(SpriteKind.MiniMenu)
                     menu_options = [miniMenu.createMenuItem("Back")]
                     for (let names of maps_names) {
                         menu_options.push(miniMenu.createMenuItem(names))
                     }
-                    menu_inner = miniMenu.createMenuFromArray(menu_options)
-                    menu_inner.setDimensions(sprite_title.width, scene.screenHeight() - 12 - sprite_title.height)
-                    menu_inner.setTitle("Select a map:")
-                    menu_inner.setFlag(SpriteFlag.Ghost, true)
-                    menu_inner.setFlag(SpriteFlag.RelativeToCamera, true)
-                    menu_inner.setPosition(5, sprite_title.bottom + 4)
-                    menu_inner.onButtonPressed(controller.A, function (selection, selectedIndex) {
+                    make_title_menu("Select a map:", menu_options).onButtonPressed(controller.A, function (selection, selectedIndex) {
                         option_selected = true
                         sprites.destroyAllSpritesOfKind(SpriteKind.MiniMenu)
                         if (selectedIndex > 0) {
@@ -707,12 +708,7 @@ timer.background(function () {
                     for (let names of car_images_names) {
                         menu_options.push(miniMenu.createMenuItem(names))
                     }
-                    menu_inner = miniMenu.createMenuFromArray(menu_options)
-                    menu_inner.setDimensions(sprite_title.width, scene.screenHeight() - 12 - sprite_title.height)
-                    menu_inner.setTitle("Select a skin:")
-                    menu_inner.setFlag(SpriteFlag.Ghost, true)
-                    menu_inner.setFlag(SpriteFlag.RelativeToCamera, true)
-                    menu_inner.setPosition(5, sprite_title.bottom + 4)
+                    menu_inner = make_title_menu("Select a skin:", menu_options)
                     for (let index = 0; index < blockSettings.readNumber("user_skin") + 1; index++) {
                         menu_inner.moveSelection(miniMenu.MoveDirection.Down)
                     }
@@ -728,14 +724,7 @@ timer.background(function () {
                     game.showSystemMenu()
                 } else {
                     sprites.destroyAllSpritesOfKind(SpriteKind.MiniMenu)
-                    menu_options = [miniMenu.createMenuItem("No, don't reset"), miniMenu.createMenuItem("Yes, reset")]
-                    menu_inner = miniMenu.createMenuFromArray(menu_options)
-                    menu_inner.setDimensions(sprite_title.width, scene.screenHeight() - 12 - sprite_title.height)
-                    menu_inner.setTitle("Confirm reset")
-                    menu_inner.setFlag(SpriteFlag.Ghost, true)
-                    menu_inner.setFlag(SpriteFlag.RelativeToCamera, true)
-                    menu_inner.setPosition(5, sprite_title.bottom + 4)
-                    menu_inner.onButtonPressed(controller.A, function (selection, selectedIndex) {
+                    make_title_menu("Confirm reset", [miniMenu.createMenuItem("No, don't reset"), miniMenu.createMenuItem("Yes, reset")]).onButtonPressed(controller.A, function (selection, selectedIndex) {
                         option_selected = true
                         sprites.destroyAllSpritesOfKind(SpriteKind.MiniMenu)
                         if (selectedIndex == 1) {
