@@ -706,17 +706,21 @@ timer.background(function () {
         sprite_321go.setPosition(scene.screenWidth() * 0.5, scene.screenHeight() * 0.2)
         for (let index = 0; index <= 2; index++) {
             sprite_321go.setText("" + (3 - index) + "...")
+            timer.background(function () {
+                music.playTone(262, 200)
+            })
             pause(1000)
         }
         sprite_321go.setText("GO!!")
+        timer.background(function () {
+            music.playTone(392, 2000)
+        })
         start_race()
         pause(1000)
         sprite_321go.destroy()
     } else {
         start_race()
     }
-    debug_checkpoints_gotten()
-    debug_reveal_checkpoints()
 })
 game.onUpdate(function () {
     if (in_game || splash_mode) {
