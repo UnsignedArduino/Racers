@@ -17,38 +17,41 @@ function debug_move_camera_with_directions () {
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Checkpoint, function (sprite, otherSprite) {
     if (in_game) {
         if (sprites.readDataNumber(sprite, "checkpoints_got") == sprites.readDataNumber(otherSprite, "checkpoint")) {
+            sprites.setDataNumber(sprite, "last_checkpoint", sprites.readDataNumber(sprite, "checkpoints_got"))
             sprites.setDataNumber(sprite, "checkpoints_got", (sprites.readDataNumber(sprite, "checkpoints_got") + 1) % map_checkpoints_needed)
             sprites.setDataSprite(sprite, "target_checkpoint", null)
         }
     }
 })
 events.tileEvent(SpriteKind.Player, assets.tile`checkerflag`, events.TileEvent.StartOverlapping, function (sprite) {
-    if (sprites.readDataNumber(sprite, "lap") == laps) {
-        if (finished_cars.indexOf(sprite) == -1) {
-            finished_cars.push(sprite)
-            sprite.startEffect(effects.confetti, 1000)
+    if (sprites.readDataNumber(sprite, "last_checkpoint") + 1 == map_checkpoints_needed) {
+        if (sprites.readDataNumber(sprite, "lap") == laps) {
+            if (finished_cars.indexOf(sprite) == -1) {
+                finished_cars.push(sprite)
+                sprite.startEffect(effects.confetti, 1000)
+                if (!(splash_mode)) {
+                    sprite.sayText("" + sprites.readDataString(sprite, "name") + ": Finished " + make_ordinal(finished_cars.length))
+                }
+                if (spriteutils.isDestroyed(sprite_finished_cars)) {
+                    sprite_finished_cars = textsprite.create("1/9 finished", 1, 15)
+                    sprite_finished_cars.setBorder(1, 15, 2)
+                    sprite_finished_cars.setFlag(SpriteFlag.Ghost, true)
+                    sprite_finished_cars.setFlag(SpriteFlag.RelativeToCamera, true)
+                    sprite_finished_cars.setPosition(scene.screenWidth() * 0.5, scene.screenHeight() * 0.1)
+                } else {
+                    sprite_finished_cars.setText("" + finished_cars.length + "/9 finished")
+                }
+            }
+            if (sprite_player == sprite) {
+                sprites.setDataBoolean(sprite, "bot", true)
+                sprites.setDataNumber(sprite, "checkpoints_got", 0)
+                sprites.setDataSprite(sprite, "target_checkpoint", null)
+            }
+        } else {
+            sprites.changeDataNumberBy(sprite, "lap", 1)
             if (!(splash_mode)) {
-                sprite.sayText("" + sprites.readDataString(sprite, "name") + ": Finished " + make_ordinal(finished_cars.length))
+                sprite.sayText("" + sprites.readDataString(sprite, "name") + ": Lap " + sprites.readDataNumber(sprite, "lap"))
             }
-            if (spriteutils.isDestroyed(sprite_finished_cars)) {
-                sprite_finished_cars = textsprite.create("1/9 finished", 1, 15)
-                sprite_finished_cars.setBorder(1, 15, 2)
-                sprite_finished_cars.setFlag(SpriteFlag.Ghost, true)
-                sprite_finished_cars.setFlag(SpriteFlag.RelativeToCamera, true)
-                sprite_finished_cars.setPosition(scene.screenWidth() * 0.5, scene.screenHeight() * 0.1)
-            } else {
-                sprite_finished_cars.setText("" + finished_cars.length + "/9 finished")
-            }
-        }
-        if (sprite_player == sprite) {
-            sprites.setDataBoolean(sprite, "bot", true)
-            sprites.setDataNumber(sprite, "checkpoints_got", 0)
-            sprites.setDataSprite(sprite, "target_checkpoint", null)
-        }
-    } else {
-        sprites.changeDataNumberBy(sprite, "lap", 1)
-        if (!(splash_mode)) {
-            sprite.sayText("" + sprites.readDataString(sprite, "name") + ": Lap " + sprites.readDataNumber(sprite, "lap"))
         }
     }
 })
@@ -396,6 +399,7 @@ function prepare_car (skin: number, place_on: number) {
     tiles.placeOnRandomTile(sprite_car, map_starting_tiles[place_on + 1])
     tileUtil.replaceAllTiles(map_starting_tiles[place_on + 1], map_starting_tiles[0])
     sprites.setDataNumber(sprite_car, "lap", 0)
+    sprites.setDataNumber(sprite_car, "last_checkpoint", map_checkpoints_needed - 1)
     sprites.setDataNumber(sprite_car, "checkpoints_got", 0)
     return sprite_car
 }
@@ -600,7 +604,7 @@ let show_minimap = false
 let in_game = false
 let car_accel = 0
 stats.turnStats(true)
-if (true) {
+if (false) {
     pause(1000)
     LoadingAnimations.show_splash()
     pause(5000)
@@ -613,7 +617,7 @@ let car_drive_max_velo = car_accel * 0.5
 let car_drive_frict = car_accel * 2
 let car_slow_max_velo = car_drive_max_velo * 0.5
 let car_slow_frict = car_drive_frict * 2
-let map_selected = -1
+let map_selected = 0
 in_game = false
 show_minimap = false
 controller.configureRepeatEventDefaults(0, 20)
@@ -711,6 +715,8 @@ timer.background(function () {
     } else {
         start_race()
     }
+    debug_checkpoints_gotten()
+    debug_reveal_checkpoints()
 })
 game.onUpdate(function () {
     if (in_game || splash_mode) {
@@ -720,7 +726,7 @@ game.onUpdate(function () {
         refresh_following()
         if (show_checkpoints_gotten) {
             for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
-                sprite.sayText("Target checkpoint: " + (sprites.readDataNumber(sprite, "checkpoints_got") + 1))
+                sprite.sayText("L: " + sprites.readDataNumber(sprite, "lap") + " CG: " + sprites.readDataNumber(sprite, "checkpoints_got") + " LC: " + sprites.readDataNumber(sprite, "last_checkpoint"))
             }
         }
     }
