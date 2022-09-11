@@ -18,7 +18,8 @@
         "Timers": "github:microsoft/arcade-timers#v1.1.0",
         "InhouseLoadingAnimations": "github:unsignedarduino/inhouseloadinganimations#v1.0.0",
         "Notifications": "github:unsignedarduino/notifications#de6517dcc280cafe902ef212f59d4f55a982c7ec",
-        "SystemMenuBlocks": "github:UnsignedArduino/SystemMenuBlocks#11b7264d682ea79f618f3538a06dc9d60d1acf78"
+        "SystemMenuBlocks": "github:UnsignedArduino/SystemMenuBlocks#11b7264d682ea79f618f3538a06dc9d60d1acf78",
+        "settings-blocks": "github:microsoft/pxt-settings-blocks#v1.0.0"
     },
     "files": [
         "main.blocks",
