@@ -175,6 +175,7 @@ function prepare_map (map_select: number) {
     LoadingAnimations.set_loading_value(LoadingAnimations.LoadingValue.Minimum, 0)
     LoadingAnimations.set_loading_value(LoadingAnimations.LoadingValue.Current, 0)
     LoadingAnimations.set_loading_value(LoadingAnimations.LoadingValue.Maximum, 8)
+    fade_out(false, true)
     pause(1000)
     tiles.setCurrentTilemap(tileUtil.cloneMap(maps[map_select]))
     map_driving_tiles = get_all_tiles_in_tilemap([maps_driving_tiles[map_select]])
@@ -234,6 +235,7 @@ function prepare_map (map_select: number) {
     finished_cars = []
     increment_loader()
     pause(1000)
+    fade_in(true, true)
     LoadingAnimations.hide_loading()
 }
 function wait_for_a_button_press () {
@@ -275,6 +277,30 @@ controller.left.onEvent(ControllerButtonEvent.Released, function () {
         move_car(sprite_player, 3, 0)
     }
 })
+function fade_out (block: boolean, delay: boolean) {
+    if (delay) {
+        color.startFade(color.Black, color.originalPalette, 2000)
+        if (block) {
+            color.pauseUntilFadeDone()
+        }
+    } else {
+        color.setPalette(
+        color.originalPalette
+        )
+    }
+}
+function fade_in (block: boolean, delay: boolean) {
+    if (delay) {
+        color.startFade(color.originalPalette, color.Black, 2000)
+        if (block) {
+            color.pauseUntilFadeDone()
+        }
+    } else {
+        color.setPalette(
+        color.Black
+        )
+    }
+}
 function define_settings () {
     if (!(blockSettings.exists("user_skin"))) {
         blockSettings.writeNumber("user_skin", 0)
@@ -603,8 +629,8 @@ if (true) {
     pause(1000)
     LoadingAnimations.show_splash()
     pause(5000)
+    fade_in(true, true)
     LoadingAnimations.hide_splash()
-    pause(1000)
 }
 let speed_multiplier = 1
 car_accel = speed_multiplier * 300
@@ -639,6 +665,7 @@ timer.background(function () {
         sprite_title.setFlag(SpriteFlag.RelativeToCamera, true)
         sprite_title.top = 4
         sprite_title.left = 4
+        fade_out(false, true)
         while (!(done_options)) {
             menu_start = miniMenu.createMenuFromArray([
             miniMenu.createMenuItem("Play"),
@@ -726,9 +753,10 @@ timer.background(function () {
                 pause(0)
             }
         }
-        sprites.destroyAllSpritesOfKind(SpriteKind.Player)
-        sprites.destroyAllSpritesOfKind(SpriteKind.Text)
         sprites.destroyAllSpritesOfKind(SpriteKind.MiniMenu)
+        sprites.destroyAllSpritesOfKind(SpriteKind.Text)
+        fade_in(true, true)
+        sprites.destroyAllSpritesOfKind(SpriteKind.Player)
         in_game = false
         splash_mode = false
     }
@@ -741,6 +769,7 @@ timer.background(function () {
     car_names_at_begin.push(miniMenu.createMenuItem("---: " + sprites.readDataString(prepare_player(blockSettings.readNumber("user_skin"), 8), "name")))
     if (true) {
         make_leaderboard(car_names_at_begin, 8)
+        fade_out(false, true)
         wait_for_a_button_press_and_release()
         menu_leaderboard.close()
     }
