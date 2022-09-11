@@ -27,7 +27,9 @@ events.tileEvent(SpriteKind.Player, assets.tile`checkerflag`, events.TileEvent.S
         if (finished_cars.indexOf(sprite) == -1) {
             finished_cars.push(sprite)
             sprite.startEffect(effects.confetti, 1000)
-            sprite.sayText("" + sprites.readDataString(sprite, "name") + ": Finished " + make_ordinal(finished_cars.length))
+            if (!(splash_mode)) {
+                sprite.sayText("" + sprites.readDataString(sprite, "name") + ": Finished " + make_ordinal(finished_cars.length))
+            }
             if (spriteutils.isDestroyed(sprite_finished_cars)) {
                 sprite_finished_cars = textsprite.create("1/9 finished", 1, 15)
                 sprite_finished_cars.setBorder(1, 15, 2)
@@ -45,7 +47,9 @@ events.tileEvent(SpriteKind.Player, assets.tile`checkerflag`, events.TileEvent.S
         }
     } else {
         sprites.changeDataNumberBy(sprite, "lap", 1)
-        sprite.sayText("" + sprites.readDataString(sprite, "name") + ": Lap " + sprites.readDataNumber(sprite, "lap"))
+        if (!(splash_mode)) {
+            sprite.sayText("" + sprites.readDataString(sprite, "name") + ": Lap " + sprites.readDataNumber(sprite, "lap"))
+        }
     }
 })
 function debug_checkpoints_gotten () {
@@ -324,7 +328,9 @@ function prepare_bot (skin: number, place_on: number) {
     sprite_bot = prepare_car(skin, place_on)
     sprites.setDataBoolean(sprite_bot, "bot", true)
     sprites.setDataString(sprite_bot, "name", bot_names.removeAt(randint(0, bot_names.length - 1)))
-    sprite_bot.sayText(sprites.readDataString(sprite_bot, "name"))
+    if (!(splash_mode)) {
+        sprite_bot.sayText(sprites.readDataString(sprite_bot, "name"))
+    }
     return sprite_bot
 }
 function prepare_car (skin: number, place_on: number) {
@@ -490,7 +496,9 @@ function prepare_player (skin: number, place_on: number) {
     scene.cameraFollowSprite(sprite_player)
     sprites.setDataBoolean(sprite_player, "bot", false)
     sprites.setDataString(sprite_player, "name", "You")
-    sprite_player.sayText(sprites.readDataString(sprite_player, "name"))
+    if (!(splash_mode)) {
+        sprite_player.sayText(sprites.readDataString(sprite_player, "name"))
+    }
     return sprite_player
 }
 function make_leaderboard (items: any[], scroll_to: number) {
@@ -499,8 +507,6 @@ function make_leaderboard (items: any[], scroll_to: number) {
         menu_leaderboard.moveSelection(miniMenu.MoveDirection.Down)
     }
     menu_leaderboard.setDimensions(scene.screenWidth() - 8, scene.screenHeight() - 10)
-    menu_leaderboard.setMenuStyleProperty(miniMenu.MenuStyleProperty.Border, 1)
-    menu_leaderboard.setMenuStyleProperty(miniMenu.MenuStyleProperty.BorderColor, images.colorBlock(15))
     menu_leaderboard.setButtonEventsEnabled(false)
     menu_leaderboard.setFlag(SpriteFlag.RelativeToCamera, true)
     menu_leaderboard.setPosition(5, 6)
@@ -555,7 +561,6 @@ let map_driving_tiles: Image[] = []
 let local_sprites: Sprite[] = []
 let maps_background_color: number[] = []
 let maps_flower_seeds: number[] = []
-let maps_names: string[] = []
 let maps_wall_tiles: tiles.TileMapData[] = []
 let maps_slow_tiles: tiles.TileMapData[] = []
 let maps_driving_tiles: tiles.TileMapData[] = []
@@ -570,10 +575,19 @@ let sprite_player: Sprite = null
 let debug_cam: Sprite = null
 let sprite_321go: TextSprite = null
 let menu_leaderboard: miniMenu.MenuSprite = null
+let car_names_at_begin: miniMenu.MenuItem[] = []
+let menu_map_select: miniMenu.MenuSprite = null
+let maps_names: string[] = []
+let menu_options: miniMenu.MenuItem[] = []
+let option_selected = false
+let menu_start: miniMenu.MenuSprite = null
+let done_options = false
+let sprite_title: TextSprite = null
 let car_images: Image[][][] = []
+let laps = 0
+let splash_mode = false
 let show_minimap = false
 let in_game = false
-let laps = 0
 let car_accel = 0
 stats.turnStats(true)
 if (true) {
@@ -589,26 +603,88 @@ let car_drive_max_velo = car_accel * 0.5
 let car_drive_frict = car_accel * 2
 let car_slow_max_velo = car_drive_max_velo * 0.5
 let car_slow_frict = car_drive_frict * 2
-laps = 3
+let map_selected = -1
 in_game = false
 show_minimap = false
 controller.configureRepeatEventDefaults(0, 20)
 define_maps()
 define_animations()
 define_bot_names()
-prepare_map(1)
-let car_names_at_begin: miniMenu.MenuItem[] = []
-for (let index = 0; index <= 7; index++) {
-    car_names_at_begin.push(miniMenu.createMenuItem("---: " + sprites.readDataString(prepare_bot(randint(0, car_images.length - 1), index), "name")))
-}
-car_names_at_begin.push(miniMenu.createMenuItem("---: " + sprites.readDataString(prepare_player(randint(0, car_images.length - 1), 8), "name")))
-if (true) {
-    make_leaderboard(car_names_at_begin, 8)
-    wait_for_a_button_press_and_release()
-    menu_leaderboard.close()
-}
-show_minimap = true
 timer.background(function () {
+    if (true) {
+        splash_mode = true
+        laps = -1
+        prepare_map(0)
+        prepare_bot(randint(0, car_images.length - 1), 0)
+        scene.cameraFollowSprite(prepare_bot(randint(0, car_images.length - 1), 1))
+        for (let index = 0; index <= 6; index++) {
+            prepare_bot(randint(0, car_images.length - 1), index)
+        }
+        sprite_title = textsprite.create("Racers!", 1, 15)
+        sprite_title.setMaxFontHeight(16)
+        sprite_title.setBorder(1, 15, 2)
+        sprite_title.setFlag(SpriteFlag.Ghost, true)
+        sprite_title.setFlag(SpriteFlag.RelativeToCamera, true)
+        sprite_title.top = 4
+        sprite_title.left = 4
+        while (!(done_options)) {
+            menu_start = miniMenu.createMenuFromArray([miniMenu.createMenuItem("Start")])
+            menu_start.setDimensions(sprite_title.width, scene.screenHeight() - 12 - sprite_title.height)
+            menu_start.setMenuStyleProperty(miniMenu.MenuStyleProperty.Border, 1)
+            menu_start.setMenuStyleProperty(miniMenu.MenuStyleProperty.BorderColor, images.colorBlock(15))
+            menu_start.setMenuStyleProperty(miniMenu.MenuStyleProperty.BackgroundColor, images.colorBlock(1))
+            menu_start.setMenuStyleProperty(miniMenu.MenuStyleProperty.UseAsTemplate, 1)
+            menu_start.setFlag(SpriteFlag.Ghost, true)
+            menu_start.setFlag(SpriteFlag.RelativeToCamera, true)
+            menu_start.setPosition(5, sprite_title.bottom + 4)
+            start_race()
+            option_selected = false
+            done_options = false
+            menu_start.onButtonPressed(controller.A, function (selection, selectedIndex) {
+                if (selectedIndex == 0) {
+                    sprites.destroyAllSpritesOfKind(SpriteKind.MiniMenu)
+                    menu_options = [miniMenu.createMenuItem("Back")]
+                    for (let names of maps_names) {
+                        menu_options.push(miniMenu.createMenuItem(names))
+                    }
+                    menu_map_select = miniMenu.createMenuFromArray(menu_options)
+                    menu_map_select.setTitle("Select a map:")
+                    menu_map_select.setFlag(SpriteFlag.Ghost, true)
+                    menu_map_select.setFlag(SpriteFlag.RelativeToCamera, true)
+                    menu_map_select.setPosition(5, sprite_title.bottom + 4)
+                    menu_map_select.onButtonPressed(controller.A, function (selection, selectedIndex) {
+                        option_selected = true
+                        sprites.destroyAllSpritesOfKind(SpriteKind.MiniMenu)
+                        if (selectedIndex > 0) {
+                            map_selected = selectedIndex - 1
+                            done_options = true
+                        }
+                    })
+                }
+            })
+            while (!(option_selected)) {
+                pause(0)
+            }
+        }
+        sprites.destroyAllSpritesOfKind(SpriteKind.Player)
+        sprites.destroyAllSpritesOfKind(SpriteKind.Text)
+        sprites.destroyAllSpritesOfKind(SpriteKind.MiniMenu)
+        splash_mode = false
+        in_game = false
+    }
+    laps = 3
+    prepare_map(map_selected)
+    car_names_at_begin = []
+    for (let index = 0; index <= 7; index++) {
+        car_names_at_begin.push(miniMenu.createMenuItem("---: " + sprites.readDataString(prepare_bot(randint(0, car_images.length - 1), index), "name")))
+    }
+    car_names_at_begin.push(miniMenu.createMenuItem("---: " + sprites.readDataString(prepare_player(randint(0, car_images.length - 1), 8), "name")))
+    if (true) {
+        make_leaderboard(car_names_at_begin, 8)
+        wait_for_a_button_press_and_release()
+        menu_leaderboard.close()
+    }
+    show_minimap = true
     if (true) {
         sprite_321go = textsprite.create("xxxx", 1, 15)
         sprite_321go.setMaxFontHeight(10)
@@ -629,7 +705,7 @@ timer.background(function () {
     }
 })
 game.onUpdate(function () {
-    if (in_game) {
+    if (in_game || splash_mode) {
         for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
             update_car_physics(sprite, car_drive_frict, car_slow_frict, car_drive_max_velo, car_slow_max_velo)
         }
