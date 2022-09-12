@@ -595,7 +595,6 @@ let bot_names: string[] = []
 let sprite_bot: Sprite = null
 let sprite_minimap: Sprite = null
 let minimap2: minimap.Minimap = null
-let menu_start: miniMenu.MenuSprite = null
 let finished_cars: Sprite[] = []
 let sprite_checkpoint: Sprite = null
 let these_checkpoints: Sprite[] = []
@@ -623,7 +622,7 @@ let debug_cam: Sprite = null
 let sprite_321go: TextSprite = null
 let menu_leaderboard: miniMenu.MenuSprite = null
 let car_names_at_begin: miniMenu.MenuItem[] = []
-let menu_inner: miniMenu.MenuSprite = null
+let menu_start: miniMenu.MenuSprite = null
 let car_images_names: string[] = []
 let maps_names: string[] = []
 let menu_options: miniMenu.MenuItem[] = []
@@ -708,11 +707,11 @@ timer.background(function () {
                     for (let names of car_images_names) {
                         menu_options.push(miniMenu.createMenuItem(names))
                     }
-                    menu_inner = make_title_menu("Select a skin:", menu_options)
+                    menu_start = make_title_menu("Select a skin:", menu_options)
                     for (let index = 0; index < blockSettings.readNumber("user_skin") + 1; index++) {
-                        menu_inner.moveSelection(miniMenu.MoveDirection.Down)
+                        menu_start.moveSelection(miniMenu.MoveDirection.Down)
                     }
-                    menu_inner.onButtonPressed(controller.A, function (selection, selectedIndex) {
+                    menu_start.onButtonPressed(controller.A, function (selection, selectedIndex) {
                         option_selected = true
                         sprites.destroyAllSpritesOfKind(SpriteKind.MiniMenu)
                         if (selectedIndex > 0) {
