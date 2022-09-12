@@ -478,7 +478,7 @@ function get_all_tiles_in_tilemap (tilemap_in_array: any[]) {
 }
 controller.menu.onEvent(ControllerButtonEvent.Pressed, function () {
     if (splash_mode) {
-    	
+        game.showSystemMenu()
     } else if (in_game) {
         timer.background(function () {
             Notification.cancelNotification()
@@ -709,12 +709,14 @@ timer.background(function () {
             miniMenu.createMenuItem("Settings"),
             miniMenu.createMenuItem("Reset preferences")
             ]).onButtonPressed(controller.A, function (selection, selectedIndex) {
+                music.playTone(262, music.beat(BeatFraction.Sixteenth))
                 if (selectedIndex == 0) {
                     menu_options = [miniMenu.createMenuItem("Back")]
                     for (let names of maps_names) {
                         menu_options.push(miniMenu.createMenuItem(names))
                     }
                     make_title_menu("Select a map:", menu_options).onButtonPressed(controller.A, function (selection, selectedIndex) {
+                        music.playTone(262, music.beat(BeatFraction.Sixteenth))
                         option_selected = true
                         if (selectedIndex > 0) {
                             map_selected = selectedIndex - 1
@@ -731,16 +733,19 @@ timer.background(function () {
                         menu_start.moveSelection(miniMenu.MoveDirection.Down)
                     }
                     menu_start.onButtonPressed(controller.A, function (selection, selectedIndex) {
+                        music.playTone(262, music.beat(BeatFraction.Sixteenth))
                         option_selected = true
                         if (selectedIndex > 0) {
                             blockSettings.writeNumber("user_skin", selectedIndex - 1)
                         }
                     })
                 } else if (selectedIndex == 2) {
+                    music.playTone(262, music.beat(BeatFraction.Sixteenth))
                     wait_for_a_button_release()
                     game.showSystemMenu()
                 } else {
                     make_title_menu("Confirm reset", [miniMenu.createMenuItem("No, don't reset"), miniMenu.createMenuItem("Yes, reset")]).onButtonPressed(controller.A, function (selection, selectedIndex) {
+                        music.playTone(262, music.beat(BeatFraction.Sixteenth))
                         option_selected = true
                         if (selectedIndex == 1) {
                             blockSettings.clear()
