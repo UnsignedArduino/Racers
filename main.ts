@@ -30,6 +30,19 @@ events.tileEvent(SpriteKind.Player, assets.tile`checkerflag`, events.TileEvent.S
 function debug_checkpoints_gotten () {
     show_checkpoints_gotten = true
 }
+function title_pop_in_sprite_left (s: Sprite) {
+    s.right = 0
+    s.ax = 1000
+    s.vx = 200
+    timer.background(function () {
+        while (s.left < 4) {
+            pause(0)
+        }
+        s.ax = 0
+        s.vx = 0
+        s.left = 4
+    })
+}
 function debug_reveal_checkpoints () {
     for (let sprite of sprites.allOfKind(SpriteKind.Checkpoint)) {
         sprite.setFlag(SpriteFlag.Invisible, false)
@@ -243,6 +256,12 @@ function wait_for_a_button_press () {
         pause(0)
     }
 }
+function title_pop_away_sprite_left (s: Sprite) {
+    s.setFlag(SpriteFlag.AutoDestroy, true)
+    s.ax = -1000
+    s.vx = -200
+    s.lifespan = 1000
+}
 controller.down.onEvent(ControllerButtonEvent.Released, function () {
     if (in_game && !(sprites.readDataBoolean(sprite_player, "bot"))) {
         move_car(sprite_player, 2, 0)
@@ -348,6 +367,9 @@ function update_minimap () {
     }
 }
 function make_title_menu (title: string, options: any[]) {
+    if (!(spriteutils.isDestroyed(menu_start))) {
+        title_pop_away_sprite_left(menu_start)
+    }
     menu_start = miniMenu.createMenuFromArray(options)
     if (title.length > 0) {
         menu_start.setTitle(title)
@@ -355,8 +377,8 @@ function make_title_menu (title: string, options: any[]) {
     menu_start.setDimensions(sprite_title.width, scene.screenHeight() - 12 - sprite_title.height)
     menu_start.setFlag(SpriteFlag.Ghost, true)
     menu_start.setFlag(SpriteFlag.RelativeToCamera, true)
-    menu_start.setFlag(SpriteFlag.AutoDestroy, true)
-    menu_start.setPosition(5, sprite_title.bottom + 4)
+    menu_start.top = sprite_title.bottom + 4
+    title_pop_in_sprite_left(menu_start)
     return menu_start
 }
 function prepare_bot (skin: number, place_on: number) {
@@ -636,7 +658,7 @@ let show_minimap = false
 let in_game = false
 let car_accel = 0
 stats.turnStats(true)
-if (true) {
+if (false) {
     pause(1000)
     LoadingAnimations.show_splash()
     pause(5000)
@@ -675,7 +697,7 @@ timer.background(function () {
         sprite_title.setFlag(SpriteFlag.Ghost, true)
         sprite_title.setFlag(SpriteFlag.RelativeToCamera, true)
         sprite_title.top = 4
-        sprite_title.left = 4
+        title_pop_in_sprite_left(sprite_title)
         fade_out(false, true)
         while (!(done_options)) {
             start_race()
@@ -688,21 +710,18 @@ timer.background(function () {
             miniMenu.createMenuItem("Reset preferences")
             ]).onButtonPressed(controller.A, function (selection, selectedIndex) {
                 if (selectedIndex == 0) {
-                    sprites.destroyAllSpritesOfKind(SpriteKind.MiniMenu)
                     menu_options = [miniMenu.createMenuItem("Back")]
                     for (let names of maps_names) {
                         menu_options.push(miniMenu.createMenuItem(names))
                     }
                     make_title_menu("Select a map:", menu_options).onButtonPressed(controller.A, function (selection, selectedIndex) {
                         option_selected = true
-                        sprites.destroyAllSpritesOfKind(SpriteKind.MiniMenu)
                         if (selectedIndex > 0) {
                             map_selected = selectedIndex - 1
                             done_options = true
                         }
                     })
                 } else if (selectedIndex == 1) {
-                    sprites.destroyAllSpritesOfKind(SpriteKind.MiniMenu)
                     menu_options = [miniMenu.createMenuItem("Back")]
                     for (let names of car_images_names) {
                         menu_options.push(miniMenu.createMenuItem(names))
@@ -713,7 +732,6 @@ timer.background(function () {
                     }
                     menu_start.onButtonPressed(controller.A, function (selection, selectedIndex) {
                         option_selected = true
-                        sprites.destroyAllSpritesOfKind(SpriteKind.MiniMenu)
                         if (selectedIndex > 0) {
                             blockSettings.writeNumber("user_skin", selectedIndex - 1)
                         }
@@ -722,10 +740,8 @@ timer.background(function () {
                     wait_for_a_button_release()
                     game.showSystemMenu()
                 } else {
-                    sprites.destroyAllSpritesOfKind(SpriteKind.MiniMenu)
                     make_title_menu("Confirm reset", [miniMenu.createMenuItem("No, don't reset"), miniMenu.createMenuItem("Yes, reset")]).onButtonPressed(controller.A, function (selection, selectedIndex) {
                         option_selected = true
-                        sprites.destroyAllSpritesOfKind(SpriteKind.MiniMenu)
                         if (selectedIndex == 1) {
                             blockSettings.clear()
                             define_settings()
@@ -741,9 +757,11 @@ timer.background(function () {
                 pause(0)
             }
         }
+        title_pop_away_sprite_left(menu_start)
+        title_pop_away_sprite_left(sprite_title)
+        fade_in(true, true)
         sprites.destroyAllSpritesOfKind(SpriteKind.MiniMenu)
         sprites.destroyAllSpritesOfKind(SpriteKind.Text)
-        fade_in(true, true)
         sprites.destroyAllSpritesOfKind(SpriteKind.Player)
         in_game = false
         splash_mode = false
