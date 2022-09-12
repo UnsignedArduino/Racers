@@ -658,7 +658,7 @@ let show_minimap = false
 let in_game = false
 let car_accel = 0
 stats.turnStats(true)
-if (false) {
+if (true) {
     pause(1000)
     LoadingAnimations.show_splash()
     pause(5000)
