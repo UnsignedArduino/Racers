@@ -164,7 +164,7 @@ controller.up.onEvent(ControllerButtonEvent.Repeated, function () {
     }
 })
 function define_maps () {
-    maps = [tilemap`classic_loop_map`, tilemap`forest_map`]
+    maps = [tilemap`classic_loop_map`, tilemap`forest_map`, tilemap`beach_side_map`]
     maps_checkpoints_needed = [6, 10]
     maps_starting_tile = [tilemap`classic_loop_starting_tiles`, tilemap`forest_map_starting_tiles`]
     maps_driving_tiles = [tilemap`classic_loop_map_driving_tiles`, tilemap`forest_map_driving_tiles`]
