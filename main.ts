@@ -481,7 +481,7 @@ controller.menu.onEvent(ControllerButtonEvent.Pressed, function () {
         game.showSystemMenu()
     } else if (in_game) {
         timer.background(function () {
-            Notification.cancelNotification()
+            Notification.waitForNotificationFinish()
             Notification.notify("Cannot open system menu right now, go to start menu to change settings!")
         })
     }
@@ -737,6 +737,10 @@ timer.background(function () {
                         option_selected = true
                         if (selectedIndex > 0) {
                             blockSettings.writeNumber("user_skin", selectedIndex - 1)
+                            timer.background(function () {
+                                Notification.waitForNotificationFinish()
+                                Notification.notify("Successfully changed skin to " + selection + "!")
+                            })
                         }
                     })
                 } else if (selectedIndex == 2) {
