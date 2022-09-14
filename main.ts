@@ -228,7 +228,13 @@ function prepare_map (map_select: number) {
     assets.tile`checkpoint_7_tile`,
     assets.tile`checkpoint_8_tile`,
     assets.tile`checkpoint_9_tile`,
-    assets.tile`checkpoint_10_tile`
+    assets.tile`checkpoint_10_tile`,
+    assets.tile`checkpoint_11_tile1`,
+    assets.tile`checkpoint_12_tile`,
+    assets.tile`checkpoint_13_tile0`,
+    assets.tile`checkpoint_14_tile0`,
+    assets.tile`checkpoint_15_tile0`,
+    assets.tile`checkpoint_16_tile`
     ]
     all_checkpoints = []
     for (let index = 0; index <= map_checkpoints_needed - 1; index++) {

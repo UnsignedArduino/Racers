@@ -577,14 +577,14 @@ namespace myTiles {
             case "level26":return tiles.createTilemap(hex`020001000102`, img`
 . . 
 `, [myTiles.transparency16,myTiles.tile27,myTiles.tile37], TileScale.Sixteen);
-            case "beachside_map_wall_tiles":
-            case "level28":return tiles.createTilemap(hex`020001000102`, img`
-. . 
-`, [myTiles.transparency16,myTiles.tile27,sprites.builtin.forestTiles0], TileScale.Sixteen);
             case "beachside_map_slow_tiles":
             case "level27":return tiles.createTilemap(hex`020001000102`, img`
 . . 
 `, [myTiles.transparency16,myTiles.tile1,sprites.castle.tilePath5], TileScale.Sixteen);
+            case "beachside_map_wall_tiles":
+            case "level28":return tiles.createTilemap(hex`020001000201`, img`
+. . 
+`, [myTiles.transparency16,sprites.builtin.forestTiles0,myTiles.tile21], TileScale.Sixteen);
         }
         return null;
     })

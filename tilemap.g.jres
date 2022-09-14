@@ -619,17 +619,6 @@
         ],
         "displayName": "beachside_map_driving_tiles"
     },
-    "level28": {
-        "id": "level28",
-        "mimeType": "application/mkcd-tilemap",
-        "data": "MTAwMjAwMDEwMDAxMDIwMA==",
-        "tileset": [
-            "myTiles.transparency16",
-            "myTiles.tile27",
-            "sprites.builtin.forestTiles0"
-        ],
-        "displayName": "beachside_map_wall_tiles"
-    },
     "level27": {
         "id": "level27",
         "mimeType": "application/mkcd-tilemap",
@@ -640,6 +629,17 @@
             "sprites.castle.tilePath5"
         ],
         "displayName": "beachside_map_slow_tiles"
+    },
+    "level28": {
+        "id": "level28",
+        "mimeType": "application/mkcd-tilemap",
+        "data": "MTAwMjAwMDEwMDAyMDEwMA==",
+        "tileset": [
+            "myTiles.transparency16",
+            "sprites.builtin.forestTiles0",
+            "myTiles.tile21"
+        ],
+        "displayName": "beachside_map_wall_tiles"
     },
     "*": {
         "mimeType": "image/x-mkcd-f4",
