@@ -165,14 +165,14 @@ controller.up.onEvent(ControllerButtonEvent.Repeated, function () {
 })
 function define_maps () {
     maps = [tilemap`classic_loop_map`, tilemap`forest_map`, tilemap`beach_side_map`]
-    maps_checkpoints_needed = [6, 10]
-    maps_starting_tile = [tilemap`classic_loop_starting_tiles`, tilemap`forest_map_starting_tiles`]
-    maps_driving_tiles = [tilemap`classic_loop_map_driving_tiles`, tilemap`forest_map_driving_tiles`]
-    maps_slow_tiles = [tilemap`classic_loop_map_slow_tiles`, tilemap`forest_map_slow_tiles`]
-    maps_wall_tiles = [tilemap`classic_loop_map_wall_tiles`, tilemap`forest_map_wall_tiles`]
-    maps_names = ["Classic loop", "Forest"]
-    maps_flower_seeds = [645, 165]
-    maps_background_color = [images.colorBlock(7), images.colorBlock(7)]
+    maps_checkpoints_needed = [6, 10, 16]
+    maps_starting_tile = [tilemap`classic_loop_starting_tiles`, tilemap`forest_map_starting_tiles`, tilemap`beachside_map_starting_tiles`]
+    maps_driving_tiles = [tilemap`classic_loop_map_driving_tiles`, tilemap`forest_map_driving_tiles`, tilemap`beachside_map_driving_tiles`]
+    maps_slow_tiles = [tilemap`classic_loop_map_slow_tiles`, tilemap`forest_map_slow_tiles`, tilemap`beachside_map_slow_tiles`]
+    maps_wall_tiles = [tilemap`classic_loop_map_wall_tiles`, tilemap`forest_map_wall_tiles`, tilemap`beachside_map_wall_tiles`]
+    maps_names = ["Classic loop", "Forest", "Ocean"]
+    maps_flower_seeds = [645, 165, 321]
+    maps_background_color = [images.colorBlock(7), images.colorBlock(7), images.colorBlock(7)]
 }
 function get_overlapping_sprites (target: Sprite, kind: number) {
     local_sprites = []
