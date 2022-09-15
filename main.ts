@@ -208,6 +208,7 @@ function prepare_map (map_select: number) {
         for (let index = 0; index < tiles.getTilesByType(assets.tile`grass`).length / 6; index++) {
             for (let tile of [sprites.castle.tileGrass1, sprites.castle.tileGrass3, sprites.castle.tileGrass2]) {
                 tiles.setTileAt(rng_flower.randomElement(tiles.getTilesByType(assets.tile`grass`)), tile)
+                pause(0)
             }
         }
     }
@@ -215,6 +216,7 @@ function prepare_map (map_select: number) {
     for (let tile of map_wall_tiles) {
         for (let location of tiles.getTilesByType(tile)) {
             tiles.setWallAt(location, true)
+            pause(0)
         }
     }
     increment_loader()
@@ -248,6 +250,7 @@ function prepare_map (map_select: number) {
             tiles.placeOnTile(sprite_checkpoint, location)
             tiles.setTileAt(location, map_driving_tiles[0])
             these_checkpoints.push(sprite_checkpoint)
+            pause(0)
         }
         all_checkpoints.push(these_checkpoints)
     }
@@ -476,6 +479,7 @@ function get_all_tiles_in_tilemap (tilemap_in_array: any[]) {
             if (local_all_tiles.indexOf(tiles.tileImageAtLocation(tiles.getTileLocation(x, y))) == -1) {
                 local_all_tiles.push(tiles.tileImageAtLocation(tiles.getTileLocation(x, y)))
             }
+            pause(0)
         }
     }
     tiles.setCurrentTilemap(local_last_tilemap)
