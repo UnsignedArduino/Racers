@@ -27,6 +27,12 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Checkpoint, function (sprite, ot
 events.tileEvent(SpriteKind.Player, assets.tile`checkerflag`, events.TileEvent.StartOverlapping, function (sprite) {
 	
 })
+function full_screen_menu_pop_away_down (s: Sprite) {
+    s.setFlag(SpriteFlag.AutoDestroy, true)
+    s.ay = 1000
+    s.vy = 200
+    s.lifespan = 3000
+}
 function debug_checkpoints_gotten () {
     show_checkpoints_gotten = true
 }
@@ -606,6 +612,19 @@ function debug_place_tiles_in_top_right (tiles2: any[]) {
         tiles.setTileAt(tiles.getTileLocation(x, 0), tiles2[x])
     }
 }
+function full_screen_menu_pop_in_down (s: Sprite) {
+    s.bottom = 0
+    s.ay = 1000
+    s.vy = 200
+    timer.background(function () {
+        while (s.top < 4) {
+            pause(0)
+        }
+        s.ay = 0
+        s.vy = 0
+        s.y = scene.screenHeight() / 2
+    })
+}
 function debug_show_car_physics () {
     for (let sprite of sprites.allOfKind(SpriteKind.Player)) {
         sprite.setFlag(SpriteFlag.ShowPhysics, true)
@@ -644,7 +663,9 @@ function make_leaderboard (items: any[], scroll_to: number) {
     menu_leaderboard.setDimensions(scene.screenWidth() - 8, scene.screenHeight() - 10)
     menu_leaderboard.setButtonEventsEnabled(false)
     menu_leaderboard.setFlag(SpriteFlag.RelativeToCamera, true)
-    menu_leaderboard.setPosition(5, 6)
+    menu_leaderboard.x = scene.screenWidth() / 2
+    menu_leaderboard.y = scene.screenHeight() / 2
+    menu_leaderboard.z = 100
 }
 function update_car_physics (car: Sprite, drive_frict: number, slow_frict: number, drive_max_velo: number, slow_max_velo: number) {
     for (let tile of map_driving_tiles) {
@@ -750,7 +771,7 @@ define_bot_names()
 define_menu_styles()
 define_settings()
 timer.background(function () {
-    if (true) {
+    if (false) {
         splash_mode = true
         laps = -1
         prepare_map(0)
@@ -843,7 +864,7 @@ timer.background(function () {
         in_game = false
         splash_mode = false
     }
-    laps = 3
+    laps = 0
     prepare_map(map_selected)
     car_names_at_begin = []
     for (let index = 0; index <= 7; index++) {
@@ -852,9 +873,10 @@ timer.background(function () {
     car_names_at_begin.push(miniMenu.createMenuItem("---: " + sprites.readDataString(prepare_player(blockSettings.readNumber("user_skin"), 8), "name")))
     if (true) {
         make_leaderboard(car_names_at_begin, 8)
+        full_screen_menu_pop_in_down(menu_leaderboard)
         fade_out(false, true)
         wait_for_a_button_press_and_release()
-        menu_leaderboard.close()
+        full_screen_menu_pop_away_down(menu_leaderboard)
     }
     show_minimap = true
     if (true) {
@@ -958,6 +980,7 @@ forever(function () {
             sprite_finished_cars.destroy()
             show_minimap = false
             make_leaderboard(local_player_names, finished_cars.indexOf(sprite_player))
+            full_screen_menu_pop_in_down(menu_leaderboard)
             wait_for_a_button_press_and_release()
             game.over(true)
         }
