@@ -14,6 +14,12 @@ function debug_move_camera_with_directions () {
     sprite_player
     )
 }
+function label_pop_away_up (s: Sprite) {
+    s.setFlag(SpriteFlag.AutoDestroy, true)
+    s.ay = -500
+    s.vy = -100
+    s.lifespan = 3000
+}
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Checkpoint, function (sprite, otherSprite) {
     if (in_game) {
         if (sprites.readDataNumber(sprite, "checkpoints_got") == sprites.readDataNumber(otherSprite, "checkpoint")) {
@@ -379,6 +385,19 @@ function fade_out (block: boolean, delay: boolean) {
         color.originalPalette
         )
     }
+}
+function label_pop_in_down (s: Sprite) {
+    s.bottom = 0
+    s.ay = 500
+    s.vy = 100
+    timer.background(function () {
+        while (s.top < 12) {
+            pause(0)
+        }
+        s.ay = 0
+        s.vy = 0
+        s.top = 12
+    })
 }
 function fade_in (block: boolean, delay: boolean) {
     if (delay) {
@@ -747,7 +766,7 @@ let show_minimap = false
 let in_game = false
 let car_accel = 0
 stats.turnStats(true)
-if (false) {
+if (true) {
     pause(1000)
     LoadingAnimations.show_splash()
     pause(5000)
@@ -771,7 +790,7 @@ define_bot_names()
 define_menu_styles()
 define_settings()
 timer.background(function () {
-    if (false) {
+    if (true) {
         splash_mode = true
         laps = -1
         prepare_map(0)
@@ -864,7 +883,7 @@ timer.background(function () {
         in_game = false
         splash_mode = false
     }
-    laps = 0
+    laps = 3
     prepare_map(map_selected)
     car_names_at_begin = []
     for (let index = 0; index <= 7; index++) {
@@ -880,12 +899,15 @@ timer.background(function () {
     }
     show_minimap = true
     if (true) {
-        sprite_321go = textsprite.create("xxxx", 1, 15)
-        sprite_321go.setMaxFontHeight(10)
-        sprite_321go.setBorder(1, 15, 2)
-        sprite_321go.setFlag(SpriteFlag.Ghost, true)
-        sprite_321go.setFlag(SpriteFlag.RelativeToCamera, true)
-        sprite_321go.setPosition(scene.screenWidth() * 0.5, scene.screenHeight() * 0.2)
+        if (true) {
+            sprite_321go = textsprite.create("xxxx", 1, 15)
+            sprite_321go.setMaxFontHeight(10)
+            sprite_321go.setBorder(1, 15, 2)
+            sprite_321go.setFlag(SpriteFlag.Ghost, true)
+            sprite_321go.setFlag(SpriteFlag.RelativeToCamera, true)
+            sprite_321go.x = scene.screenWidth() * 0.5
+            label_pop_in_down(sprite_321go)
+        }
         for (let index = 0; index <= 2; index++) {
             sprite_321go.setText("" + (3 - index) + "...")
             timer.background(function () {
@@ -898,8 +920,23 @@ timer.background(function () {
             music.playTone(392, 2000)
         })
         start_race()
-        pause(1000)
-        sprite_321go.destroy()
+        pause(5000)
+        label_pop_away_up(sprite_321go)
+        if (true) {
+            if (laps == 0) {
+                sprite_321go = textsprite.create("Drive to the finish line!", 1, 15)
+            } else {
+                sprite_321go = textsprite.create("Drive " + laps + " laps to finish!", 1, 15)
+            }
+            sprite_321go.setBorder(1, 15, 2)
+            sprite_321go.setFlag(SpriteFlag.Ghost, true)
+            sprite_321go.setFlag(SpriteFlag.RelativeToCamera, true)
+            sprite_321go.x = scene.screenWidth() * 0.5
+            label_pop_in_down(sprite_321go)
+            timer.after(5000, function () {
+                label_pop_away_up(sprite_321go)
+            })
+        }
     } else {
         start_race()
     }
@@ -934,11 +971,14 @@ game.onUpdate(function () {
                                     sprite.sayText("" + sprites.readDataString(sprite, "name") + ": Finished " + make_ordinal(finished_cars.length))
                                 }
                                 if (spriteutils.isDestroyed(sprite_finished_cars)) {
-                                    sprite_finished_cars = textsprite.create("1/9 finished", 1, 15)
-                                    sprite_finished_cars.setBorder(1, 15, 2)
-                                    sprite_finished_cars.setFlag(SpriteFlag.Ghost, true)
-                                    sprite_finished_cars.setFlag(SpriteFlag.RelativeToCamera, true)
-                                    sprite_finished_cars.setPosition(scene.screenWidth() * 0.5, scene.screenHeight() * 0.1)
+                                    timer.background(function () {
+                                        sprite_finished_cars = textsprite.create("1/9 finished", 1, 15)
+                                        sprite_finished_cars.setBorder(1, 15, 2)
+                                        sprite_finished_cars.setFlag(SpriteFlag.Ghost, true)
+                                        sprite_finished_cars.setFlag(SpriteFlag.RelativeToCamera, true)
+                                        sprite_finished_cars.setPosition(scene.screenWidth() * 0.5, scene.screenHeight() * 0.1)
+                                        label_pop_in_down(sprite_finished_cars)
+                                    })
                                 } else {
                                     sprite_finished_cars.setText("" + finished_cars.length + "/9 finished")
                                 }
@@ -977,8 +1017,8 @@ forever(function () {
             for (let index = 0; index <= finished_cars.length - 1; index++) {
                 local_player_names.push(miniMenu.createMenuItem("" + make_ordinal(index + 1) + ": " + sprites.readDataString(finished_cars[index], "name")))
             }
-            sprite_finished_cars.destroy()
             show_minimap = false
+            label_pop_away_up(sprite_finished_cars)
             make_leaderboard(local_player_names, finished_cars.indexOf(sprite_player))
             full_screen_menu_pop_in_down(menu_leaderboard)
             wait_for_a_button_press_and_release()
