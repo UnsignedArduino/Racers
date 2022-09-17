@@ -258,15 +258,15 @@ function prepare_map (map_select: number) {
         }
     } else if (maps_flower_seeds[map_select] < 0) {
         rng_decoration = Random.createRNG(Math.abs(maps_flower_seeds[map_select]))
-        for (let index = 0; index < tiles.getTilesByType(sprites.builtin.forestTiles10).length / 6; index++) {
+        all_black_tiles = tiles.getTilesByType(sprites.builtin.forestTiles10)
+        for (let index = 0; index < all_black_tiles.length / 6; index++) {
             for (let tile of [
             assets.tile`night_star_2`,
             assets.tile`night_star_1`,
             assets.tile`night_star_0`,
             assets.tile`night_star_4`
             ]) {
-                tiles.setTileAt(rng_decoration.randomElement(tiles.getTilesByType(sprites.builtin.forestTiles10)), tile)
-                pause(0)
+                tiles.setTileAt(rng_decoration.randomElement(all_black_tiles), tile)
             }
         }
     }
@@ -274,7 +274,6 @@ function prepare_map (map_select: number) {
     for (let tile of map_wall_tiles) {
         for (let location of tiles.getTilesByType(tile)) {
             tiles.setWallAt(location, true)
-            pause(0)
         }
     }
     increment_loader()
@@ -690,6 +689,7 @@ let sprite_checkpoint: Sprite = null
 let these_checkpoints: Sprite[] = []
 let all_checkpoints: Sprite[][] = []
 let all_checkpoint_tiles: Image[] = []
+let all_black_tiles: tiles.Location[] = []
 let rng_decoration: FastRandomBlocks = null
 let map_name = ""
 let map_wall_tiles: Image[] = []
