@@ -164,15 +164,60 @@ controller.up.onEvent(ControllerButtonEvent.Repeated, function () {
     }
 })
 function define_maps () {
-    maps = [tilemap`classic_loop_map`, tilemap`forest_map`, tilemap`beach_side_map`]
-    maps_checkpoints_needed = [6, 10, 16]
-    maps_starting_tile = [tilemap`classic_loop_starting_tiles`, tilemap`forest_map_starting_tiles`, tilemap`beachside_map_starting_tiles`]
-    maps_driving_tiles = [tilemap`classic_loop_map_driving_tiles`, tilemap`forest_map_driving_tiles`, tilemap`beachside_map_driving_tiles`]
-    maps_slow_tiles = [tilemap`classic_loop_map_slow_tiles`, tilemap`forest_map_slow_tiles`, tilemap`beachside_map_slow_tiles`]
-    maps_wall_tiles = [tilemap`classic_loop_map_wall_tiles`, tilemap`forest_map_wall_tiles`, tilemap`beachside_map_wall_tiles`]
-    maps_names = ["Classic loop", "Forest", "Ocean"]
-    maps_flower_seeds = [645, 165, 321]
-    maps_background_color = [images.colorBlock(7), images.colorBlock(7), images.colorBlock(7)]
+    maps = [
+    tilemap`classic_loop_map`,
+    tilemap`forest_map`,
+    tilemap`beach_side_map`,
+    tilemap`space_map`
+    ]
+    maps_checkpoints_needed = [
+    6,
+    10,
+    16,
+    9
+    ]
+    maps_starting_tile = [
+    tilemap`classic_loop_starting_tiles`,
+    tilemap`forest_map_starting_tiles`,
+    tilemap`beachside_map_starting_tiles`,
+    tilemap`space_map_starting_tiles`
+    ]
+    maps_driving_tiles = [
+    tilemap`classic_loop_map_driving_tiles`,
+    tilemap`forest_map_driving_tiles`,
+    tilemap`beachside_map_driving_tiles`,
+    tilemap`space_map_driving_tiles`
+    ]
+    maps_slow_tiles = [
+    tilemap`classic_loop_map_slow_tiles`,
+    tilemap`forest_map_slow_tiles`,
+    tilemap`beachside_map_slow_tiles`,
+    tilemap`space_map_slow_tiles`
+    ]
+    maps_wall_tiles = [
+    tilemap`classic_loop_map_wall_tiles`,
+    tilemap`forest_map_wall_tiles`,
+    tilemap`beachside_map_wall_tiles`,
+    tilemap`space_map_wall_tiles`
+    ]
+    maps_names = [
+    "Classic loop",
+    "Forest",
+    "Ocean",
+    "Star"
+    ]
+    maps_flower_seeds = [
+    645,
+    165,
+    321,
+    -281
+    ]
+    maps_background_color = [
+    images.colorBlock(7),
+    images.colorBlock(7),
+    images.colorBlock(7),
+    images.colorBlock(15)
+    ]
 }
 function get_overlapping_sprites (target: Sprite, kind: number) {
     local_sprites = []
@@ -203,11 +248,24 @@ function prepare_map (map_select: number) {
     map_name = maps_names[map_select]
     scene.setBackgroundColor(maps_background_color[map_select])
     increment_loader()
-    if (maps_flower_seeds[map_select] != -1) {
-        rng_flower = Random.createRNG(maps_flower_seeds[map_select])
+    if (maps_flower_seeds[map_select] > 0) {
+        rng_decoration = Random.createRNG(maps_flower_seeds[map_select])
         for (let index = 0; index < tiles.getTilesByType(assets.tile`grass`).length / 6; index++) {
             for (let tile of [sprites.castle.tileGrass1, sprites.castle.tileGrass3, sprites.castle.tileGrass2]) {
-                tiles.setTileAt(rng_flower.randomElement(tiles.getTilesByType(assets.tile`grass`)), tile)
+                tiles.setTileAt(rng_decoration.randomElement(tiles.getTilesByType(assets.tile`grass`)), tile)
+                pause(0)
+            }
+        }
+    } else if (maps_flower_seeds[map_select] < 0) {
+        rng_decoration = Random.createRNG(Math.abs(maps_flower_seeds[map_select]))
+        for (let index = 0; index < tiles.getTilesByType(sprites.builtin.forestTiles10).length / 6; index++) {
+            for (let tile of [
+            assets.tile`night_star_2`,
+            assets.tile`night_star_1`,
+            assets.tile`night_star_0`,
+            assets.tile`night_star_4`
+            ]) {
+                tiles.setTileAt(rng_decoration.randomElement(tiles.getTilesByType(sprites.builtin.forestTiles10)), tile)
                 pause(0)
             }
         }
@@ -632,7 +690,7 @@ let sprite_checkpoint: Sprite = null
 let these_checkpoints: Sprite[] = []
 let all_checkpoints: Sprite[][] = []
 let all_checkpoint_tiles: Image[] = []
-let rng_flower: FastRandomBlocks = null
+let rng_decoration: FastRandomBlocks = null
 let map_name = ""
 let map_wall_tiles: Image[] = []
 let map_slow_tiles: Image[] = []
@@ -668,7 +726,7 @@ let show_minimap = false
 let in_game = false
 let car_accel = 0
 stats.turnStats(true)
-if (true) {
+if (false) {
     pause(1000)
     LoadingAnimations.show_splash()
     pause(5000)
