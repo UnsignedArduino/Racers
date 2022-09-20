@@ -181,55 +181,63 @@ function define_maps () {
     tilemap`forest_map`,
     tilemap`beach_side_map`,
     tilemap`space_map`,
-    tilemap`mountain_map`
+    tilemap`mountain_map`,
+    tilemap`cannonball_cove_map`
     ]
     maps_checkpoints_needed = [
     6,
     10,
     16,
     9,
-    13
+    13,
+    16
     ]
     maps_starting_tile = [
     tilemap`classic_loop_starting_tiles`,
     tilemap`forest_map_starting_tiles`,
     tilemap`beachside_map_starting_tiles`,
     tilemap`space_map_starting_tiles`,
-    tilemap`mountain_map_starting_tiles`
+    tilemap`mountain_map_starting_tiles`,
+    tilemap`cannonball_cove_starting_tiles`
     ]
     maps_driving_tiles = [
     tilemap`classic_loop_map_driving_tiles`,
     tilemap`forest_map_driving_tiles`,
     tilemap`beachside_map_driving_tiles`,
     tilemap`space_map_driving_tiles`,
-    tilemap`mountain_map_driving_tiles`
+    tilemap`mountain_map_driving_tiles`,
+    tilemap`cannonball_cove_driving_tiles`
     ]
     maps_slow_tiles = [
     tilemap`classic_loop_map_slow_tiles`,
     tilemap`forest_map_slow_tiles`,
     tilemap`beachside_map_slow_tiles`,
     tilemap`space_map_slow_tiles`,
-    tilemap`mountain_map_slow_tiles`
+    tilemap`mountain_map_slow_tiles`,
+    tilemap`cannonball_cove_slow_tiles`
     ]
     maps_wall_tiles = [
     tilemap`classic_loop_map_wall_tiles`,
     tilemap`forest_map_wall_tiles`,
     tilemap`beachside_map_wall_tiles`,
     tilemap`space_map_wall_tiles`,
-    tilemap`mountain_map_wall_tiles`
+    tilemap`mountain_map_wall_tiles`,
+    tilemap`cannonball_cove_wall_tiles`
     ]
     maps_names = [
     "Classic loop",
     "Forest",
     "Ocean",
     "Star",
-    "Mountain - by Lucas_M"
+    "Mountain - by Lucas_M",
+    "Cannonball Cove - by Lucas_M"
     ]
     maps_flower_seeds = [
     645,
     165,
     321,
     -281,
+    0,
     0
     ]
     maps_background_color = [
@@ -237,6 +245,7 @@ function define_maps () {
     images.colorBlock(7),
     images.colorBlock(7),
     images.colorBlock(15),
+    images.colorBlock(7),
     images.colorBlock(7)
     ]
 }
@@ -475,6 +484,9 @@ function make_title_menu (title: string, options: any[]) {
         menu_start.setTitle(title)
     }
     menu_start.setDimensions(sprite_title.width, scene.screenHeight() - 12 - sprite_title.height)
+    if (options.length > 6) {
+        menu_start.setMenuStyleProperty(miniMenu.MenuStyleProperty.ScrollIndicatorColor, images.colorBlock(15))
+    }
     menu_start.setFlag(SpriteFlag.Ghost, true)
     menu_start.setFlag(SpriteFlag.RelativeToCamera, true)
     menu_start.top = sprite_title.bottom + 4
@@ -775,7 +787,7 @@ let show_minimap = false
 let in_game = false
 let car_accel = 0
 stats.turnStats(true)
-if (true) {
+if (false) {
     pause(1000)
     LoadingAnimations.show_splash()
     pause(5000)
