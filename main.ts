@@ -475,7 +475,7 @@ function update_minimap () {
         }
     }
 }
-function make_title_menu (title: string, options: any[]) {
+function make_title_menu (title: string, options: any[], can_exit: boolean) {
     if (!(spriteutils.isDestroyed(menu_start))) {
         title_pop_away_sprite_left(menu_start)
     }
@@ -486,6 +486,12 @@ function make_title_menu (title: string, options: any[]) {
     menu_start.setDimensions(sprite_title.width, scene.screenHeight() - 12 - sprite_title.height)
     if (options.length > 6) {
         menu_start.setMenuStyleProperty(miniMenu.MenuStyleProperty.ScrollIndicatorColor, images.colorBlock(15))
+    }
+    if (can_exit) {
+        menu_start.onButtonPressed(controller.B, function (selection, selectedIndex) {
+            music.playTone(262, music.beat(BeatFraction.Sixteenth))
+            option_selected = true
+        })
     }
     menu_start.setFlag(SpriteFlag.Ghost, true)
     menu_start.setFlag(SpriteFlag.RelativeToCamera, true)
@@ -787,7 +793,7 @@ let show_minimap = false
 let in_game = false
 let car_accel = 0
 stats.turnStats(true)
-if (false) {
+if (true) {
     pause(1000)
     LoadingAnimations.show_splash()
     pause(5000)
@@ -837,14 +843,14 @@ timer.background(function () {
             miniMenu.createMenuItem("Skins"),
             miniMenu.createMenuItem("Settings"),
             miniMenu.createMenuItem("Reset preferences")
-            ]).onButtonPressed(controller.A, function (selection, selectedIndex) {
+            ], false).onButtonPressed(controller.A, function (selection, selectedIndex) {
                 music.playTone(262, music.beat(BeatFraction.Sixteenth))
                 if (selectedIndex == 0) {
                     menu_options = [miniMenu.createMenuItem("Back")]
                     for (let names of maps_names) {
                         menu_options.push(miniMenu.createMenuItem(names))
                     }
-                    make_title_menu("Select a map:", menu_options).onButtonPressed(controller.A, function (selection, selectedIndex) {
+                    make_title_menu("Select a map:", menu_options, true).onButtonPressed(controller.A, function (selection, selectedIndex) {
                         music.playTone(262, music.beat(BeatFraction.Sixteenth))
                         option_selected = true
                         if (selectedIndex > 0) {
@@ -857,7 +863,7 @@ timer.background(function () {
                     for (let names of car_images_names) {
                         menu_options.push(miniMenu.createMenuItem(names))
                     }
-                    menu_start = make_title_menu("Select a skin:", menu_options)
+                    menu_start = make_title_menu("Select a skin:", menu_options, true)
                     for (let index = 0; index < blockSettings.readNumber("user_skin") + 1; index++) {
                         menu_start.moveSelection(miniMenu.MoveDirection.Down)
                     }
@@ -877,7 +883,7 @@ timer.background(function () {
                     wait_for_a_button_release()
                     game.showSystemMenu()
                 } else {
-                    make_title_menu("Confirm reset", [miniMenu.createMenuItem("No, don't reset"), miniMenu.createMenuItem("Yes, reset")]).onButtonPressed(controller.A, function (selection, selectedIndex) {
+                    make_title_menu("Confirm reset", [miniMenu.createMenuItem("No, don't reset"), miniMenu.createMenuItem("Yes, reset")], true).onButtonPressed(controller.A, function (selection, selectedIndex) {
                         music.playTone(262, music.beat(BeatFraction.Sixteenth))
                         option_selected = true
                         if (selectedIndex == 1) {

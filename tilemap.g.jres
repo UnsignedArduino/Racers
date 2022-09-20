@@ -986,25 +986,6 @@
         ],
         "displayName": "space_map_slow_tiles"
     },
-    "level32": {
-        "id": "level32",
-        "mimeType": "application/mkcd-tilemap",
-        "data": "MTAwYTAwMDEwMDAxMDIwMzA0MDUwNjA3MDgwOTBhMDAwMDAwMDAwMA==",
-        "tileset": [
-            "myTiles.transparency16",
-            "myTiles.tile74",
-            "myTiles.tile73",
-            "myTiles.tile75",
-            "myTiles.tile76",
-            "myTiles.tile77",
-            "myTiles.tile78",
-            "myTiles.tile79",
-            "myTiles.tile80",
-            "myTiles.tile81",
-            "myTiles.tile82"
-        ],
-        "displayName": "space_map_starting_tiles"
-    },
     "level33": {
         "id": "level33",
         "mimeType": "application/mkcd-tilemap",
@@ -1277,6 +1258,25 @@
             "myTiles.tile104"
         ],
         "displayName": "cannonball_cove_wall_tiles"
+    },
+    "level32": {
+        "id": "level32",
+        "mimeType": "application/mkcd-tilemap",
+        "data": "MTAwYTAwMDEwMDBhMDEwMjAzMDQwNTA2MDcwODA5MDAwMDAwMDAwMA==",
+        "tileset": [
+            "myTiles.transparency16",
+            "myTiles.tile73",
+            "myTiles.tile75",
+            "myTiles.tile76",
+            "myTiles.tile77",
+            "myTiles.tile78",
+            "myTiles.tile79",
+            "myTiles.tile80",
+            "myTiles.tile81",
+            "myTiles.tile82",
+            "myTiles.tile83"
+        ],
+        "displayName": "space_map_starting_tiles"
     },
     "*": {
         "mimeType": "image/x-mkcd-f4",

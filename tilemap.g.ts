@@ -715,10 +715,6 @@ namespace myTiles {
             case "level31":return tiles.createTilemap(hex`0100010001`, img`
 . 
 `, [myTiles.transparency16,sprites.builtin.forestTiles10], TileScale.Sixteen);
-            case "space_map_starting_tiles":
-            case "level32":return tiles.createTilemap(hex`0a0001000102030405060708090a`, img`
-. . . . . . . . . . 
-`, [myTiles.transparency16,myTiles.tile74,myTiles.tile73,myTiles.tile75,myTiles.tile76,myTiles.tile77,myTiles.tile78,myTiles.tile79,myTiles.tile80,myTiles.tile81,myTiles.tile82], TileScale.Sixteen);
             case "space_map_driving_tiles":
             case "level33":return tiles.createTilemap(hex`020001000102`, img`
 . . 
@@ -947,6 +943,10 @@ namespace myTiles {
             case "level43":return tiles.createTilemap(hex`0400010002030104`, img`
 . . . . 
 `, [myTiles.transparency16,myTiles.tile84,myTiles.tile99,myTiles.tile100,myTiles.tile104], TileScale.Sixteen);
+            case "space_map_starting_tiles":
+            case "level32":return tiles.createTilemap(hex`0a0001000a010203040506070809`, img`
+. . . . . . . . . . 
+`, [myTiles.transparency16,myTiles.tile73,myTiles.tile75,myTiles.tile76,myTiles.tile77,myTiles.tile78,myTiles.tile79,myTiles.tile80,myTiles.tile81,myTiles.tile82,myTiles.tile83], TileScale.Sixteen);
         }
         return null;
     })
