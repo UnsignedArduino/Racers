@@ -579,7 +579,7 @@ controller.down.onEvent(ControllerButtonEvent.Repeated, function () {
         move_car(sprite_player, 2, car_accel)
     }
 })
-function get_all_tiles_in_tilemap (tilemap_in_array: any[]) {
+function get_all_tiles_in_tilemap (tilemap_in_array: tiles.TileMapData[]) {
     local_all_tiles = []
     local_last_tilemap = tileUtil.currentTilemap()
     tiles.setCurrentTilemap(tilemap_in_array[0])
@@ -653,7 +653,7 @@ function debug_camera_follow_random_car () {
     scene.cameraFollowSprite(sprite)
     sprite.setFlag(SpriteFlag.ShowPhysics, true)
 }
-function debug_place_tiles_in_top_right (tiles2: any[]) {
+function debug_place_tiles_in_top_right (tiles2: Image[]) {
     for (let x = 0; x <= tiles2.length - 1; x++) {
         tiles.setTileAt(tiles.getTileLocation(x, 0), tiles2[x])
     }
@@ -793,7 +793,7 @@ let show_minimap = false
 let in_game = false
 let car_accel = 0
 stats.turnStats(true)
-if (true) {
+if (false) {
     pause(1000)
     LoadingAnimations.show_splash()
     pause(5000)
@@ -801,11 +801,11 @@ if (true) {
     LoadingAnimations.hide_splash()
 }
 let speed_multiplier = 1
-car_accel = speed_multiplier * 300
-let car_drive_max_velo = car_accel * 0.5
-let car_drive_frict = car_accel * 2
-let car_slow_max_velo = car_drive_max_velo * 0.5
-let car_slow_frict = car_drive_frict * 2
+car_accel = speed_multiplier * 500
+let car_drive_max_velo = car_accel * 0.333
+let car_drive_frict = car_accel * 0.333
+let car_slow_max_velo = car_drive_max_velo * 0.333
+let car_slow_frict = car_drive_frict * 3
 let map_selected = 0
 in_game = false
 show_minimap = false
